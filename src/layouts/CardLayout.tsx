@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import type { FC } from "react";
 import { splitCategory } from "../utils/splitText";
 
@@ -79,7 +79,9 @@ const CardLayout: FC<CardProps> = ({ cardContent }) => {
                             </div>
                             <div className="flex-1 flex items-center justify-center overflow-hidden">
                                 <img
-                                    ref={(el) => (imageRefs.current[key] = el)}
+                                    ref={(el) => {
+                                        imageRefs.current[key] = el;
+                                    }}
                                     src={item.image}
                                     alt={item.category}
                                     className="w-full h-auto object-contain max-h-[300px] transition-transform duration-300"
@@ -105,7 +107,9 @@ const CardLayout: FC<CardProps> = ({ cardContent }) => {
                             >
                                 <div className="flex-1 flex items-center justify-center w-full px-4 overflow-hidden">
                                     <img
-                                        ref={(el) => (imageRefs.current[key] = el)}
+                                        ref={(el) => {
+                                            imageRefs.current[key] = el;
+                                        }}
                                         src={item.image}
                                         alt={item.category}
                                         className="max-h-32 object-contain transition-transform duration-300"

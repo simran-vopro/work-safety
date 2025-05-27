@@ -71,12 +71,13 @@ const Header = () => {
                     </ul>
                   </div>
                 </div>
-              ) : (
+              ) : item.path ? (
                 <Link key={item.path} to={item.path} className="nav-link">
                   {item.name}
                 </Link>
-              )
+              ) : null
             )}
+
           </div>
 
           {/* Right icons */}
@@ -151,7 +152,7 @@ const Header = () => {
                   );
                 }
 
-                return (
+                return path ? (
                   <Link
                     key={name}
                     to={path}
@@ -165,7 +166,7 @@ const Header = () => {
                   >
                     {name}
                   </Link>
-                );
+                ) : null;
               })}
             </nav>
           </div>
