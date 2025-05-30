@@ -22,7 +22,7 @@ const NewsletterPage = () => {
 
             {/* Newsletter Input Container */}
             <div className="w-full max-w-4xl">
-                <div className="relative flex items-center border-b border-gray-300 focus-within:border-orange-500 transition-colors">
+                <div className="relative flex items-center border-b border-gray-300 focus-within:border-purple-500 transition-colors">
                     {/* Left Icon */}
                     <Mail className="text-gray-500 w-6 h-6 mr-3" />
 
@@ -43,7 +43,7 @@ const NewsletterPage = () => {
                             : "translate-x-4 opacity-0 pointer-events-none"
                             }`}
                     >
-                        <button className="ml-3 text-sm md:text-base font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+                        <button className="ml-3 text-sm md:text-base font-semibold text-primary hover:text-puple-500 transition-colors">
                             Subscribe
                         </button>
                     </div>

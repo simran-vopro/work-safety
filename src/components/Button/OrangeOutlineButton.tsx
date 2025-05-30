@@ -19,10 +19,10 @@ const OrangeOutlineButton: React.FC<OrangeOutlineButtonProps> = ({
     <button
       type={type}
       onClick={onClick}
-      className={`relative mt-6 overflow-hidden flex items-center gap-2 border border-orange-500 text-orange-500 px-4 py-2 font-semibold w-fit group ${className}`}
+      className={`relative overflow-hidden flex items-center gap-2 border border-primary text-primary px-4 py-2 font-semibold w-fit group ${className}`}
     >
       <span
-        className="absolute inset-0 bg-orange-500 transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0"
+        className="absolute inset-0 bg-primary transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0"
         aria-hidden="true"
       ></span>
 

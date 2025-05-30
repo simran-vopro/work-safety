@@ -69,7 +69,7 @@ const CardLayout: FC<CardProps> = ({ cardContent }) => {
                             onMouseLeave={() => handleMouseLeave(key)}
                         >
                             <div className="p-6 flex-1 flex flex-col justify-center">
-                                <p className="text-orange-400 app-text">{item.tagLine}</p>
+                                <p className="text-primary text-sm">{item.tagLine}</p>
                                 <p className="text-2xl md:text-3xl font-extrabold mt-2">{splitCategory(item.category)}</p>
                                 <div className="mt-4">
                                     <p className={`app-text nav-link ${isCenterCard ? "text-gray-700" : "text-gray-300"}`}>

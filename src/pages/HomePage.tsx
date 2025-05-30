@@ -1,4 +1,3 @@
-// src/pages/HomePage.tsx
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -7,6 +6,8 @@ import images from "../components/imagesPath";
 import SectionHeading from "../components/SectionHeading";
 import OrangeOutlineButton from "../components/Button/OrangeOutlineButton";
 import ProductGrid from "../layouts/ProductGrid";
+import { useState } from "react";
+import useProducts from "../hooks/useProduct";
 
 const slides = [
     { product: "Safety Boots", image: "/slider1.jpg" },
@@ -14,64 +15,38 @@ const slides = [
     { product: "Safety Helmet", image: "/slider1.jpg" },
 ];
 
-const products = [
-    {
-        id: 1,
-        category: "Footwear",
-        title: "Work Shoe OB 39/6 Black 39",
-        image: images.feet,
+interface Category {
+    _id: string;
+    image?: string;
+    icon?: string;
+    Category1?: string;
+    Category2?: string;
+    "Image Ref"?: string;
+    Category1Id?: string;
+    Category2Id?: string;
+}
 
-    },
-    {
-        id: 2,
-        category: "Cloths",
-        title: "Combat Trousers Khaki 34",
-        image: images.cloths,
-    },
-    {
-        id: 3,
-        category: "Feet",
-        title: "Safety Clog 35/2 Black 35",
-        image: images.head,
-    },
-    {
-        id: 4,
-        category: "Jackets",
-        title: "Heated Tunnel Jacket Black SR",
-        image: images.jackets,
-    },
-    {
-        id: 5,
-        category: "Footwear",
-        title: "Safety Boots",
-        image: images.cloths,
-    },
-    {
-        id: 6,
-        category: "Gloves",
-        title: "Work Gloves",
-        image: images.feet,
-    },
-    {
-        id: 7,
-        category: "Head Protection",
-        title: "Safety Helmet",
-        image: images.head,
-    },
-    {
-        id: 8,
-        category: "Eye Protection",
-        title: "Safety Goggles",
-        image: images.eye,
-    },
-    {
-        id: 9,
-        category: "Footwear",
-        title: "Safety Boots",
-        image: images.cloths,
-    },
-
-];
+export interface ProductType {
+    _id: string;
+    Code: string;
+    Description: string;
+    Pack: number;
+    rrp: number;
+    GrpSupplier: string;
+    GrpSupplierCode: string;
+    Manufacturer: string;
+    ManufacturerCode: string;
+    ISPCCombined: number;
+    VATCode: number;
+    Brand: string;
+    ExtendedCharacterDesc: string;
+    CatalogueCopy: string;
+    "Image Ref": string;
+    Style: string;
+    Category1: Category;
+    Category2: Category;
+    Category3: Category;
+}
 
 const reviews = [
     {
@@ -95,6 +70,13 @@ const reviews = [
 ];
 
 const HomePage = () => {
+
+    const [page, setPage] = useState(1);
+    const limit = 20;
+
+    const { products, productLoading, totalPages } = useProducts({ page, limit });
+
+
     return (
         <div className="w-full relative bg-white">
             <div>
@@ -110,17 +92,17 @@ const HomePage = () => {
                         768: { slidesPerView: 1 },
                         1024: { slidesPerView: 1 },
                     }}
-                // className="w-full"
-                >
-                    {slides.map((slide, index) => (
-                        <SwiperSlide key={index}>
-                            <div
-                                className="relative  h-[500px] md:h-[700px] bg-cover bg-center flex flex-col justify-center  text-gray-800"
-                                style={{ backgroundImage: `url(${slide.image})` }}
-                            >
-                                <div className="container-padding flex flex-col justify-center items-center md:block">
 
-                                    <p className="text-orange-400 text-sm md:text-base font-semibold">
+                >
+                    {slides.map(() => (
+                        <SwiperSlide>
+                            <div
+                                className="relative h-[500px] md:h-[500px] bg-cover bg-center flex flex-col justify-center  text-gray-800"
+                                style={{ backgroundImage: `url(${images.new_arrivals})` }}
+                            >
+                                {/* <div className="container mx-auto flex flex-col justify-center items-center md:block">
+
+                                    <p className="text-primary text-sm md:text-base font-semibold">
                                         {slide.product}
                                     </p>
                                     <p className="text-gray text-md md:text-lg mt-1">Trusted. Reliable. Durable.</p>
@@ -132,7 +114,7 @@ const HomePage = () => {
                                         icon={<ArrowRight className="w-4 h-4" />}
                                         onClick={() => console.log("Button clicked!")}
                                     />
-                                </div>
+                                </div> */}
 
                             </div>
                         </SwiperSlide>
@@ -224,7 +206,7 @@ const HomePage = () => {
                             Gear Up for Safety with Confidence
                         </p>
 
-                        <div className="w-20 h-2 bg-orange-600 rounded-sm my-5"></div>
+                        <div className="w-20 h-2 bg-primary rounded-sm my-5"></div>
 
                         <p className="app-text">
                             Explore our range of top-tier workwear designed to keep you protected and comfortable on the job. From durable
@@ -232,6 +214,7 @@ const HomePage = () => {
                         </p>
 
                         <OrangeOutlineButton
+                            className="mt-10"
                             label="View More"
                             icon={<ArrowRight className="w-4 h-4" />}
                             onClick={() => console.log("Button clicked!")}
@@ -251,7 +234,6 @@ const HomePage = () => {
             </div>
 
             <div className="container-padding section-space">
-
                 {/* Heading */}
                 <SectionHeading
                     heading={
@@ -262,7 +244,32 @@ const HomePage = () => {
                     description="Shop the best in safety and workplace essentials, featuring premium PPE, cleaning supplies, office organization, and more to power your productivity."
                 />
 
-                <ProductGrid products={products} />
+                {
+                    productLoading ? "loading" : <>
+                        <ProductGrid products={products ?? []} />
+
+                        {/* Pagination Controls */}
+                        <div className="flex justify-center mt-6 space-x-2">
+                            <button
+                                disabled={page === 1}
+                                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                                className="px-4 py-2 border rounded disabled:opacity-50"
+                            >
+                                Previous
+                            </button>
+
+                            <span className="px-4 py-2">{`Page ${page} of ${totalPages}`}</span>
+
+                            <button
+                                disabled={page === totalPages}
+                                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                                className="px-4 py-2 border rounded disabled:opacity-50"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </>
+                }
             </div>
 
             <div className="bg-[#f5f5f5] relative">
@@ -298,7 +305,7 @@ const HomePage = () => {
                                 slidesPerGroup: 4,
                             },
                         }}
-                        touchRatio={1}         
+                        touchRatio={1}
                         allowTouchMove={true}
                     >
 

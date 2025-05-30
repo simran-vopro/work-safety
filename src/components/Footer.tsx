@@ -10,8 +10,8 @@ type FooterProps = {
 const Footer:FC<FooterProps> = ({ onLinkClick }) => (
   <footer className="bg-gray-800 text-white  w-full ">
     {/* Top subscription section */}
-    <div className="container-padding py-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-0">
-      {/* Left text */}
+    {/* <div className="container-padding py-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-0">
+
       <div className="md:w-1/2 text-sm md:text-base leading-relaxed">
         <p className="font-semibold mb-2">Stay Connected</p>
         <p className="text-gray-400 font-normal">
@@ -19,7 +19,7 @@ const Footer:FC<FooterProps> = ({ onLinkClick }) => (
         </p>
       </div>
 
-      {/* Right subscription form */}
+
       <form className="md:w-1/2 flex flex-row gap-3 items-center justify-center w-full">
         <input
           type="email"
@@ -31,7 +31,7 @@ const Footer:FC<FooterProps> = ({ onLinkClick }) => (
           Subscribe
         </button>
       </form>
-    </div>
+    </div> */}
 
     {/* Light grey separator */}
     <div className="bg-gray-700 h-[1px] w-full" />
@@ -42,7 +42,7 @@ const Footer:FC<FooterProps> = ({ onLinkClick }) => (
       <div>
         <h2 className="font-bold text-2xl mb-2">
           WorkSafety
-          <span className="w-1 h-1 bg-orange-400 inline-block" />
+          <span className="w-1 h-1 bg-primary inline-block" />
         </h2>
         <p className="mb-6 text-gray-300">
           Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
@@ -72,7 +72,7 @@ const Footer:FC<FooterProps> = ({ onLinkClick }) => (
               <Link
                 to="#"
                 onClick={onLinkClick}
-                className="nav-link mb-3 text-gray-500 hover:text-orange-400"
+                className="nav-link mb-3 text-gray-500 hover-item"
               >
                 {text}
               </Link>
@@ -90,7 +90,7 @@ const Footer:FC<FooterProps> = ({ onLinkClick }) => (
               <Link
                 to="#"
                 onClick={onLinkClick}
-                className="nav-link mb-3 text-gray-500 hover:text-orange-400"
+                className="nav-link mb-3 text-gray-500 hover-item"
               >
                 {text}
               </Link>
@@ -108,7 +108,7 @@ const Footer:FC<FooterProps> = ({ onLinkClick }) => (
               <Link
                 to="#"
                 onClick={onLinkClick}
-                className="nav-link mb-3 text-gray-500 hover:text-orange-400"
+                className="nav-link mb-3 text-gray-500 hover-item"
               >
                 {text}
               </Link>

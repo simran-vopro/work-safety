@@ -9,9 +9,9 @@ const AboutPage = () => {
     return (
         <>
             <div className="bg-[#f5f5f5] relative overflow-hidden  col-aligned-center">
-                <div className="container-padding flex">
+                <div className="container-padding container-padding-mid flex">
                     {/* Left Text Section */}
-                    <div className="flex-2 py-16 md:py-30">
+                    <div className="flex-2 py-5 md:py-30">
 
 
                         <p className="site-heading text-left mb-3 uppercase">
@@ -21,7 +21,7 @@ const AboutPage = () => {
                         <p className="text-gray-700 text-sm md:text-base font-semibold uppercase">
                             Gear Up for Safety with Confidence
                         </p>
-                        <div className="w-20 h-2 bg-orange-600 rounded-sm my-5"></div>
+                        <div className="w-20 h-2 bg-primary rounded-sm my-5"></div>
 
 
 
@@ -45,7 +45,7 @@ const AboutPage = () => {
                 </div>
             </div>
 
-            <div className="container-padding section-space">
+            <div className="container-padding container-padding-mid section-space">
                 {/* Heading */}
                 <SectionHeading
                     heading={
@@ -59,9 +59,9 @@ const AboutPage = () => {
 
                 <div className="flex items-center">
                     {/* Left Text Section */}
-                    <div className="flex-1 py-16 md:py-30 relative">
-                        <div className="absolute md:top-16 -left-20 -z-10">
-                            <p className="site-heading text-gray-100 text-8xl text-left">01</p>
+                    <div className="flex-1 py-5 md:py-30 md:pr-5 relative">
+                        <div className="md:absolute top-0 md:top-16 left-0 md:-left-20 -z-10 about-index">
+                            <p className="site-heading text-gray-100 text-7xl md:text-8xl text-left">01</p>
                         </div>
                         <div className="z-10">
                             <p className="span-word text-sm md:text-sm font-normal uppercase mb-3">
@@ -73,17 +73,15 @@ const AboutPage = () => {
 
                             <p className="app-text my-5">At Work Safety, our mission is clear: to deliver superior workwear solutions that prioritize your safety without compromising on style or comfort. We are dedicated to equipping you with the gear that allows you to focus on what truly matters—your work.</p>
 
-                            <div className="flex items-center">
-                                <div className="w-20 h-1 bg-orange-400"></div>
+                            {/* <div className="flex items-center">
+                                <div className="w-20 h-1 bg-primary"></div>
                                 <div className="flex-1 h-0.5 bg-gray-300"></div>
-                            </div>
+                            </div> */}
                         </div>
-
-
                     </div>
 
                     {/* Right Image - Hidden on Mobile */}
-                    <div className="flex-1 flex items-end justify-end">
+                    <div className="flex-1 hidden md:flex items-end justify-end">
                         <img
                             src={images.a1}
                             alt="Work Safety Gear"
@@ -96,7 +94,7 @@ const AboutPage = () => {
                 <div className="flex items-center">
 
                     {/* Right Image - Hidden on Mobile */}
-                    <div className="flex-1 flex items-start justify-start">
+                    <div className="flex-1 hidden md:flex items-start justify-start">
                         <img
                             src={images.a2}
                             alt="Work Safety Gear"
@@ -106,9 +104,9 @@ const AboutPage = () => {
 
 
                     {/* Left Text Section */}
-                    <div className="flex-1 py-16 md:py-30 relative">
-                        <div className="absolute md:top-16 -left-20 -z-10">
-                            <p className="site-heading text-gray-100 text-8xl text-left">02</p>
+                    <div className="flex-1 py-5 md:py-30 md:pl-5 relative">
+                        <div className="md:absolute top-0 md:top-16 left-0 md:-left-20 -z-10 about-index">
+                            <p className="site-heading text-gray-100 text-7xl md:text-8xl text-left">02</p>
                         </div>
                         <div className="z-10">
                             <p className="span-word text-sm md:text-sm font-normal uppercase mb-3">
@@ -126,10 +124,10 @@ const AboutPage = () => {
                             </ul>
 
 
-                            <div className="flex items-center">
-                                <div className="w-20 h-1 bg-orange-400"></div>
+                            {/* <div className="flex items-center">
+                                <div className="w-20 h-1 bg-primary"></div>
                                 <div className="flex-1 h-0.5 bg-gray-300"></div>
-                            </div>
+                            </div> */}
                         </div>
 
 
@@ -140,9 +138,9 @@ const AboutPage = () => {
 
                 <div className="flex items-center">
                     {/* Left Text Section */}
-                    <div className="flex-1 py-16 md:py-30 relative">
-                        <div className="absolute md:top-16 -left-20 -z-10">
-                            <p className="site-heading text-gray-100 text-8xl text-left">03</p>
+                    <div className="flex-1 py-5 md:py-30 md:pr-5 relative">
+                        <div className="md:absolute top-0 md:top-16 left-0 md:-left-20 -z-10 about-index">
+                            <p className="site-heading text-gray-100 text-7xl md:text-8xl text-left">03</p>
                         </div>
                         <div className="z-10">
                             <p className="span-word text-sm md:text-sm font-normal uppercase mb-3">
@@ -154,17 +152,17 @@ const AboutPage = () => {
 
                             <p className="app-text my-5">From heavy-duty safety boots to ergonomic high-visibility jackets, our comprehensive range of workwear is tailored to meet the diverse demands of various professions. Whether you’re in construction, logistics, or any other industry, Work Safety has you covered.</p>
 
-                            <div className="flex items-center">
-                                <div className="w-20 h-1 bg-orange-400"></div>
+                            {/* <div className="flex items-center">
+                                <div className="w-20 h-1 bg-primary"></div>
                                 <div className="flex-1 h-0.5 bg-gray-300"></div>
-                            </div>
+                            </div> */}
                         </div>
 
 
                     </div>
 
                     {/* Right Image - Hidden on Mobile */}
-                    <div className="flex-1 flex items-end justify-end">
+                    <div className="flex-1 hidden md:flex items-end justify-end">
                         <img
                             src={images.full_width_1}
                             alt="Work Safety Gear"
@@ -177,7 +175,7 @@ const AboutPage = () => {
                 <div className="flex items-center">
 
                     {/* Right Image - Hidden on Mobile */}
-                    <div className="flex-1 flex items-start justify-start">
+                    <div className="flex-1 hidden md:flex items-start justify-start">
                         <img
                             src={images.a4}
                             alt="Work Safety Gear"
@@ -187,9 +185,9 @@ const AboutPage = () => {
 
 
                     {/* Left Text Section */}
-                    <div className="flex-1 py-16 md:py-30 relative">
-                        <div className="absolute md:top-16 -left-20 -z-10">
-                            <p className="site-heading text-gray-100 text-8xl text-left">04</p>
+                    <div className="flex-1 py-5 md:py-30 md:pl-5 relative">
+                        <div className="md:absolute top-0 md:top-16 left-0 md:-left-20 -z-10 about-index">
+                            <p className="site-heading text-gray-100 text-7xl md:text-8xl text-left">04</p>
                         </div>
                         <div className="z-10">
                             <p className="span-word text-sm md:text-sm font-normal uppercase mb-3">
@@ -209,19 +207,13 @@ const AboutPage = () => {
                             </ul>
 
 
-                            <div className="flex items-center">
-                                <div className="w-20 h-1 bg-orange-400"></div>
+                            {/* <div className="flex items-center">
+                                <div className="w-20 h-1 bg-primary"></div>
                                 <div className="flex-1 h-0.5 bg-gray-300"></div>
-                            </div>
+                            </div> */}
                         </div>
-
-
                     </div>
-
-
                 </div>
-
-
             </div>
 
             <BrandLayout />

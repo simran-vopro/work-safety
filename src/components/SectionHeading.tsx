@@ -2,7 +2,7 @@ import React from "react";
 
 interface SectionHeadingProps {
     heading: React.ReactNode;
-    description: string;
+    description?: string;
     className?: string;
     uppercase?: boolean;
 }
@@ -14,7 +14,7 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
     uppercase = false,
 }) => {
     return (
-        <div className={className ?? "mb-30 flex flex-col items-center text-center px-4 sm:px-6"}>
+        <div className={className ?? "mb-10 md:mb:30 flex flex-col items-center text-center px-4 sm:px-6"}>
             <h2 className={`site-heading pb-10 ${uppercase ? "uppercase" : ""}`}>
                 {heading}
             </h2>

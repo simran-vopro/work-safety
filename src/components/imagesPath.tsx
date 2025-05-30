@@ -22,6 +22,8 @@ import a2 from "../assets/images/about/2.jpg";
 import a3 from "../assets/images/about/3.jpg";
 import a4 from "../assets/images/about/4.jpg";
 
+import new_arrivals from "../assets/images/categories/1.jpg"
+
 const images = {
     feet,
     hand,
@@ -42,7 +44,8 @@ const images = {
     a1,
     a2,
     a3,
-    a4
+    a4,
+    new_arrivals
 }
 
 

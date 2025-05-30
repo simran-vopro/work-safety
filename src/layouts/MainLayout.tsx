@@ -10,7 +10,7 @@ type MainLayoutProps = {
 const MainLayout = ({ children }: MainLayoutProps) => (
   <div className="min-h-screen">
     <Header />
-    <main className="mt-16 flex-grow mx-auto relative">
+    <main className="flex-grow mx-auto relative">
       {children}
     </main>
     <Footer />
