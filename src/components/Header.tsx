@@ -15,14 +15,14 @@ import {
   ArrowRight,
   Flag,
   LeafIcon,
-  BellElectric
+  BellElectric,
+  X,
 } from "lucide-react";
 
 import clsx from "clsx";
 import OrangeOutlineButton from "./Button/OrangeOutlineButton";
 import useCategories from "../hooks/useCat";
 import useProducts from "../hooks/useProduct";
-
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -53,15 +53,15 @@ const Header = () => {
   const { categories, loading } = useCategories();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [dropdownAlignments, setDropdownAlignments] = useState<Record<number, "left" | "center" | "right">>({});
+  const [dropdownAlignments, setDropdownAlignments] = useState<
+    Record<number, "left" | "center" | "right">
+  >({});
   const [hoveredSubCategory, setHoveredSubCategory] = useState<string>("");
   const [subCategories, setSubCategories] = useState<string[]>([]);
-
 
   const [search, setSearch] = useState("");
 
   const { products, productLoading } = useProducts({ search });
-
 
   console.log("search products ==>", products);
 
@@ -92,10 +92,10 @@ const Header = () => {
       <header className="w-full z-50 bg-white shadow">
         {/* Top Header */}
         <div className="border-b border-gray-200 py-2 px-4 md:px-8 flex items-center justify-between gap-4 flex-wrap">
-
           {/* Logo */}
           <Link to="/" className="font-bold text-xxl md:text-2xl text-gray-800">
-            WorkSafety<span className="w-1 h-1 bg-primary inline-block" />
+            WorkSafety
+            <span className="w-1 h-1 bg-primary inline-block" />
           </Link>
 
           {/* Search Bar */}
@@ -104,12 +104,27 @@ const Header = () => {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    navigate("/projectDetails", { state: products[0] });
+                    setSearch("");
+                  }
+                }}
                 type="text"
                 placeholder="Search Your Favourite Product..."
                 className="w-full bg-transparent focus:outline-none text-gray-500 text-lg md:text-sm py-2 pr-10 placeholder-gray-300 "
               />
 
-              <Search className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+              {search ? (
+                <X
+                  onClick={() => {
+                    setSearch("");
+                  }}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 cursor-pointer"
+                />
+              ) : (
+                <Search className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+              )}
 
               {search && products.length > 0 && (
                 <div className="absolute bg-white border border-gray-300 w-full z-50 shadow-md mt-1 rounded-md">
@@ -117,7 +132,10 @@ const Header = () => {
                     <div
                       key={product._id}
                       className="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100"
-                      onClick={() => navigate("/projectDetails", { state: product })}
+                      onClick={() => {
+                        navigate("/projectDetails", { state: product });
+                        setSearch("");
+                      }}
                     >
                       <img
                         src={product["Image Ref"]}
@@ -132,17 +150,15 @@ const Header = () => {
                   ))}
                 </div>
               )}
-
-
-
             </div>
           </div>
-
 
           {/* Icons */}
           <div className="flex items-center text-sm text-gray-700 divide-x divide-gray-300">
             <div className="flex items-center gap-1 space-x-1 cursor-pointer pr-4 text-gray-600 text-[12px]">
-              <Heart className="w-4 h-4" />
+              <Heart onClick={() => {
+                navigate("/cart")
+              }} className="w-4 h-4" />
               <p>Saved</p>
             </div>
             <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[12px]">
@@ -161,7 +177,6 @@ const Header = () => {
 
         {/* Feature Icons Row */}
         <div className="bg-gray-800 text-white px-4 md:px-8 py-2 flex flex-wrap justify-between text-[12px]">
-
           <div className="flex items-center">
             <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
               <Star className="w-4 h-4" />
@@ -169,43 +184,49 @@ const Header = () => {
             </div>
             <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
               <Phone className="w-4 h-4" />
-              <p>
-                Call Mon - Fri 8am to 5pm on 0000 2222 5555 6666</p>
+              <p>Call Mon - Fri 8am to 5pm on 0000 2222 5555 6666</p>
             </div>
           </div>
           <div className="flex items-center">
-            <OrangeOutlineButton className="mt-0" label="Shop Now" icon={<ArrowRight className="w-4 h-4" />}
-              onClick={() => console.log("Button clicked!")} />
+            <OrangeOutlineButton
+              className="mt-0"
+              label="Shop Now"
+              icon={<ArrowRight className="w-4 h-4" />}
+              onClick={() => navigate("/shop")}
+            />
             <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
               <Truck className="w-4 h-4" />
               <p>Next Day Delivery Available</p>
             </div>
             <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
               <Phone className="w-4 h-4" />
-              <p>
-                Call Mon - Fri 8am to 5pm on 0000 2222 5555 6666</p>
+              <p>Call Mon - Fri 8am to 5pm on 0000 2222 5555 6666</p>
             </div>
           </div>
-
         </div>
       </header>
 
       {/* Category Navigation */}
       <div
         ref={containerRef}
-        className="bg-[#d3d3d3] border-t border-b border-gray-200 flex flex-wrap justify-center gap-8 text-xs md:text-sm text-gray-700">
-
-        {
-          loading ? // Skeleton loader
-            Array.from({ length: 8 }).map((_, idx) => (
-              <div key={idx} className="flex flex-col items-center space-y-2 py-4 px-2 animate-pulse">
+        className="bg-[#d3d3d3] border-t border-b border-gray-200 flex flex-wrap justify-center gap-8 text-xs md:text-sm text-gray-700"
+      >
+        {loading // Skeleton loader
+          ? Array.from({ length: 8 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center space-y-2 py-4 px-2 animate-pulse"
+              >
                 <div className="w-10 h-10 bg-gray-600 rounded-full" />
                 <div className="w-16 h-3 bg-gray-600" />
               </div>
-            )) : categories && categories.map((cat, index) => {
+            ))
+          : categories &&
+            categories.map((cat, index) => {
               const alignment = dropdownAlignments[index] || "center";
 
-              let dropdownClasses = "absolute top-full mt-0 hidden group-hover:flex bg-white border border-gray-300 shadow-lg z-10 w-[90vw] max-w-[1100px] h-[600px] overflow-scroll p-4";
+              let dropdownClasses =
+                "absolute top-full mt-0 hidden group-hover:flex bg-white border border-gray-300 shadow-lg z-10 w-[90vw] max-w-[1100px] h-[600px] overflow-scroll p-4";
 
               if (alignment === "left") {
                 dropdownClasses += " left-0";
@@ -220,66 +241,80 @@ const Header = () => {
                   key={cat.Category1}
                   className="relative group flex flex-col items-center space-y-1 text-[12px] text-center cursor-pointer py-4 px-2 hover:bg-white category-item"
                 >
-
-                  <img
-                    src={cat.icon}
-                    className="w-10 h-10 mb-2"
-                    alt=""
-                  />
+                  <img src={cat.icon} className="w-10 h-10 mb-2" alt="" />
 
                   {/* <span className="mb-2"></span> */}
                   <p>{cat.Category1}</p>
 
                   {/* Dropdown */}
-                  <div className={`${dropdownClasses} opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out pointer-events-none group-hover:pointer-events-auto`}>
+                  <div
+                    className={`${dropdownClasses} opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out pointer-events-none group-hover:pointer-events-auto`}
+                  >
                     <div className="grid grid-cols-3 gap-4 w-full">
                       <div className="col-span-2 text-left">
                         <div className="bg-gray-50 border border-gray-400 p-3 px-10">
-                          <h4 className="font-semibold text-sm mb-5">Key Categories</h4>
+                          <h4 className="font-semibold text-sm mb-5">
+                            Key Categories
+                          </h4>
                           <ul className="grid grid-cols-4 gap-2">
                             {cat?.Categories2.map((item, index) => (
                               <li
-                                onMouseEnter={() => { setSubCategories(item.Categories3), setHoveredSubCategory(item.label) }}
-                                onMouseLeave={() => { setSubCategories([]), setHoveredSubCategory("") }}
+                                onMouseEnter={() => {
+                                  setSubCategories(item.Categories3),
+                                    setHoveredSubCategory(item.label);
+                                }}
+                                onMouseLeave={() => {
+                                  setSubCategories([]),
+                                    setHoveredSubCategory("");
+                                }}
                                 key={index}
-                                className="nav-link text-[12px]">
+                                className="nav-link text-[12px]"
+                              >
                                 {item.label}
                               </li>
                             ))}
                           </ul>
                         </div>
 
-
-
-                        {
-                          ((cat.allCategories3 && cat.allCategories3.length > 0) || (subCategories && subCategories.length > 0)) && <div className="bg-gray-50 border border-t-0 border-gray-400 p-3 px-10">
-                            {
-                              subCategories.length > 0 ?
-                                <>
-                                  <h4 className="font-semibold text-sm mb-5">{hoveredSubCategory}</h4>
-                                  <ul className="grid grid-cols-4 gap-2">
-                                    {subCategories?.map((item) => (
-                                      <li key={item} className="nav-link text-[12px]">
-                                        {item}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </> :
-                                <>
-                                  <h4 className="font-semibold text-sm mb-5">All Products</h4>
-                                  <ul className="grid grid-cols-4 gap-2">
-                                    {cat?.allCategories3.map((item) => (
-                                      <li key={item} className="nav-link text-[12px]">
-                                        {item}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </>
-                            }
-
+                        {((cat.allCategories3 &&
+                          cat.allCategories3.length > 0) ||
+                          (subCategories && subCategories.length > 0)) && (
+                          <div className="bg-gray-50 border border-t-0 border-gray-400 p-3 px-10">
+                            {subCategories.length > 0 ? (
+                              <>
+                                <h4 className="font-semibold text-sm mb-5">
+                                  {hoveredSubCategory}
+                                </h4>
+                                <ul className="grid grid-cols-4 gap-2">
+                                  {subCategories?.map((item) => (
+                                    <li
+                                      key={item}
+                                      className="nav-link text-[12px]"
+                                    >
+                                      {item}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </>
+                            ) : (
+                              <>
+                                <h4 className="font-semibold text-sm mb-5">
+                                  All Products
+                                </h4>
+                                <ul className="grid grid-cols-4 gap-2">
+                                  {cat?.allCategories3.map((item) => (
+                                    <li
+                                      key={item}
+                                      className="nav-link text-[12px]"
+                                    >
+                                      {item}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </>
+                            )}
                           </div>
-                        }
-
+                        )}
                       </div>
 
                       <div className="col-span-1">
@@ -293,15 +328,11 @@ const Header = () => {
                   </div>
                 </div>
               );
-            })
-        }
-
+            })}
       </div>
-
 
       {/* Bottom Info Bar */}
       <div className="bg-blue-50 py-3 px-4 md:px-8 flex flex-wrap justify-center gap-6 text-sm text-gray-700">
-
         <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]">
           <CreditCard className="w-4 h-4" />
           <p>Instant Credit</p>
@@ -319,21 +350,23 @@ const Header = () => {
           <BellElectric className="w-4 h-4" />
           <p>Shop Energy Saving</p>
         </div>
-        <div onClick={() => {
-          navigate("aboutus")
-        }} className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]">
+        <div
+          onClick={() => {
+            navigate("about");
+          }}
+          className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]"
+        >
           <Info className="w-4 h-4" />
           <p>About Us</p>
         </div>
-
-
       </div>
-
-
 
       {/* Sidebar Menu (Mobile) */}
       <div
-        className={clsx("fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300", menuOpen ? "translate-x-0" : "-translate-x-full")}
+        className={clsx(
+          "fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300",
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        )}
       >
         <div className="flex flex-col h-full">
           <div className="flex flex-col h-full p-6 space-y-6">
@@ -343,7 +376,8 @@ const Header = () => {
               onClick={() => setMenuOpen(false)}
               className="text-2xl font-bold text-white"
             >
-              WorkSafety<span className="w-1 h-1 bg-primary inline-block"></span>
+              WorkSafety
+              <span className="w-1 h-1 bg-primary inline-block"></span>
             </Link>
 
             {/* Navigation Items */}
@@ -371,7 +405,10 @@ const Header = () => {
                           {subItems?.map((label) => (
                             <li key={label} className="my-5">
                               <Link
-                                to={`/shop/${label.toLowerCase().replace(/ & /g, "-").replace(/\s+/g, "-")}`}
+                                to={`/shop/${label
+                                  .toLowerCase()
+                                  .replace(/ & /g, "-")
+                                  .replace(/\s+/g, "-")}`}
                                 onClick={() => setMenuOpen(false)}
                                 className="block text-sm text-white/70 hover:text-white"
                               >

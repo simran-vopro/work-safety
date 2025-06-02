@@ -246,7 +246,7 @@ const HomePage = () => {
 
                 {
                     productLoading ? "loading" : <>
-                        <ProductGrid products={products ?? []} />
+                        <ProductGrid products={products ?? []} gridCols={4} />
 
                         {/* Pagination Controls */}
                         <div className="flex justify-center mt-6 space-x-2">
