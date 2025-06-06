@@ -1,3 +1,4 @@
+import logo from "../assets/images/logo.png";
 import feet from "../assets/images/cat-images/feet.png";
 import hand from "../assets/images/cat-images/hand.png";
 import head from "../assets/images/cat-images/head.png";
@@ -24,7 +25,12 @@ import a4 from "../assets/images/about/4.jpg";
 
 import new_arrivals from "../assets/images/categories/1.jpg"
 
+
+import contact from "../assets/images/contact.png"
+
 const images = {
+    logo,
+    contact,
     feet,
     hand,
     head,

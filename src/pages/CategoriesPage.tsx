@@ -1,67 +1,32 @@
 // src/pages/CategoriesPage.tsx
-import { ArrowRight, ChevronLeft, ChevronRight, Headset, Truck, Undo2 } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Grid, Leaf, Truck } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import images from "../components/imagesPath";
 import OrangeOutlineButton from "../components/Button/OrangeOutlineButton";
 import { splitCategory } from "../utils/splitText";
+import { useLocation, useNavigate } from "react-router-dom";
+import useCategories from "../hooks/useCat";
+import { useEffect, useState } from "react";
+import SkeletonBox from "../components/SkeletonBox";
+import CardLayout from "../layouts/CardLayout";
 
-
-const cardContent = [
-    {
-        category: "Hand Protection",
-        totalPrducts: 35,
-        tagLine: "Grip with confidence",
-        image: images.hand,
-    },
-    {
-        category: "Head Protection",
-        totalPrducts: 15,
-        tagLine: "Think. Shield. Secure.",
-        image: images.head,
-    },
-    {
-        category: "Footwear Protection",
-        totalPrducts: 20,
-        tagLine: "Step into safety",
-        image: images.feet,
-    },
-    {
-        category: "Respiratory Protection",
-        totalPrducts: 35,
-        tagLine: "Breathe. Filter. Live.",
-        image: images.respiratory,
-    },
-    {
-        category: "Eye/Face Protection",
-        totalPrducts: 35,
-        tagLine: "See. Shield. Protect.",
-        image: images.eye,
-    },
-    {
-        category: "Hi-Vis Jackets",
-        totalPrducts: 15,
-        tagLine: "Bright. Bold. Visible.",
-        image: images.jackets,
-    },
-    {
-        category: "Customised Clothing",
-        totalPrducts: 15,
-        tagLine: "Fit. Style. Safety.",
-        image: images.cloths,
-    },
-    {
-        category: "Customised Clothing",
-        totalPrducts: 15,
-        tagLine: "Fit. Style. Safety.",
-        image: images.cloths,
-    },
-]
-
-const mainCards = cardContent.slice(0, 3);
-const extraCards = cardContent.slice(3);
 
 const CategoriesPage = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const { category, activeSubCategory } = location.state || {};
+    const { categories, categoryLoading } = useCategories();
+    const [selectedSubCategory, setSelectedSubCategory] = useState<any | null>(null);
+
+
+    useEffect(() => {
+        if (activeSubCategory) {
+            setSelectedSubCategory(activeSubCategory);
+        }
+    }, [activeSubCategory]);
+
     return (
         <div className="w-full relative bg-white">
             <div className="mt-24 px-6 md:px-0 container-padding-mid">
@@ -69,101 +34,118 @@ const CategoriesPage = () => {
                     className="container-padding relative h-[500px] md:h-[500px] p-0 bg-cover bg-center "
                     style={{ backgroundImage: `url(${images.new_arrivals})` }}>
 
-
                     <div className="bg-gradient-to-r from-gray-900 h-full w-full px-10 text-gray-100 flex flex-col justify-center">
                         <p className="text-3xl md:text-5xl font-extrabold mt-2 uppercase">
-                            New <br></br> <span className="span-word">Arrivals</span>
+                            {
+                                splitCategory(selectedSubCategory?.label ? selectedSubCategory.label : (category != "allCategories" && categories) ? category?.Category1 : "Top Categories")
+                            }
                         </p>
+
                         <OrangeOutlineButton
+                            className="mt-10"
                             label="Shop Now"
                             icon={<ArrowRight className="w-4 h-4" />}
-                            onClick={() => console.log("Button clicked!")}
+                            onClick={() => {
+                                category != "allCategories" ? navigate("/shop", { state: { category1: category?._id } }) : navigate("/shop")
+                            }}
                         />
 
                     </div>
 
-
-
                 </div>
             </div>
+
+
+            {
+                category == "allCategories" && <div className="container-padding pt-10 px-0">
+                    <CardLayout
+                        cardContent={categories}
+                        loading={categoryLoading}
+                    />
+                </div>
+            }
+
 
             <div className="container-padding md:p-0 container-padding-mid py-10">
                 {/* Card Layout */}
                 <div>
                     <div className="space-y-8">
-                        {/* First 3 Styled Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {mainCards.map((item, index) => {
-                                const isCenterCard = index === 1;
-                                const key = `main-${index}`;
+                        {selectedSubCategory && (
+                            <div className="flex flex-row items-center gap-2 mt-10">
+                                <button
+                                    className="text-sm text-gray-700 hover:underline"
+                                    onClick={() => setSelectedSubCategory(null)}
+                                >
+                                    {category != "allCategories" && category?.Category1}
+                                </button>
 
-                                return (
-                                    <div
-                                        key={key}
-                                        className={`cursor-pointer flex flex-row ${isCenterCard
-                                            ? "text-white bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700"
-                                            : "bg-gradient-to-r from-gray-100 via-gray-200 via-white text-gray-700"
-                                            }  shadow-lg overflow-hidden py-6`}
+                                <span className="text-gray-500">{">"}</span>
 
-                                    >
-                                        <div className="p-6 flex-1 flex flex-col justify-center">
-                                            <p className="text-primary app-text">{item.tagLine}</p>
-                                            <p className="text-2xl md:text-3xl font-extrabold mt-2">{splitCategory(item.category)}</p>
-                                            <div className="mt-4">
-                                                <p className={`app-text nav-link ${isCenterCard ? "text-gray-300" : "text-gray-700"}`}>
-                                                    {item.totalPrducts} Products
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex-1 flex items-center justify-center overflow-hidden">
-                                            <img
-
-                                                src={item.image}
-                                                alt={item.category}
-                                                className="w-full h-auto object-contain max-h-[300px] transition-transform duration-300"
-                                                style={{ transform: "translate3d(0,0,0)" }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        {/* Extra cards with same hover effect */}
-                        {extraCards.length > 0 && (
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-                                {extraCards.map((item, index) => {
-                                    const key = `extra-${index}`;
-                                    return (
-                                        <div
-                                            key={key}
-                                            className="cursor-pointer flex flex-col justify-between items-center bg-gradient-to-b from-gray-100 via-gray-200 via-white text-gray-700  shadow-lg overflow-hidden h-72"
-
-                                        >
-                                            <div className="flex-1 flex items-center justify-center w-full px-4 overflow-hidden">
-                                                <img
-
-                                                    src={item.image}
-                                                    alt={item.category}
-                                                    className="max-h-32 object-contain transition-transform duration-300"
-                                                    style={{ transform: "translate3d(0,0,0)" }}
-                                                />
-                                            </div>
-                                            <div className="w-full py-4 text-center">
-                                                <p className="text-sm font-semibold">{item.category}</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                <button
+                                    onClick={() => setSelectedSubCategory(null)}
+                                    className="text-sm text-pink-500 hover:underline"
+                                >
+                                    {selectedSubCategory.label}
+                                </button>
                             </div>
                         )}
+
+
+                        {
+                            categoryLoading ? (
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mt-10">
+                                    {Array.from({ length: 10 }).map((_, i) => (
+                                        <SkeletonBox key={i} className="h-16 w-full" />
+                                    ))}
+                                </div>
+                            ) : selectedSubCategory ? (
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                                    {selectedSubCategory.Categories3.map((item: any) => (
+                                        <div
+                                            key={item._id}
+                                            onClick={() => {
+                                                navigate("/shop", { state: { category1: category?._id, category2: selectedSubCategory?._id, category3: item._id } });
+                                                window.scrollTo({ top: 0, behavior: "smooth" });
+                                            }}
+                                            className="cursor-pointer bg-gray-50 text-gray-700 px-3 overflow-hidden hover:bg-pink-400 hover:text-white shadow flex flex-col items-center justify-center"
+                                        >
+                                            <div className="w-full py-4 text-center">
+                                                <p className="text-sm">{item.Category3}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mt-10">
+                                    {category != "allCategories" && category?.Categories2.map((item: any, index: number) => (
+                                        <div
+                                            key={index}
+                                            onClick={() => {
+                                                if (item?.Categories3?.length > 0) {
+                                                    setSelectedSubCategory(item);
+                                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                                } else {
+                                                    navigate("/shop", { state: { category1: category?._id, category2: item._id } });
+                                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                                }
+                                            }}
+                                            className="cursor-pointer bg-gray-50 text-gray-700 px-3 overflow-hidden hover:bg-pink-400 hover:text-white shadow flex flex-col items-center justify-center"
+                                        >
+                                            <div className="w-full py-4 text-center">
+                                                <p className="text-sm">{item.label}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>
 
 
 
-            <div className="container-padding md:px-0 container-padding-mid section-space">
+            <div className="container-padding md:px-0 section-space">
                 <div className="relative">
                     {/* Heading */}
                     <h2 className="font-bold text-lg mb-10 text-gray-700">
@@ -171,10 +153,10 @@ const CategoriesPage = () => {
                     </h2>
 
                     {/* Navigation arrows */}
-                    <div className="absolute top-1/2 -translate-y-1/2 left-0 md:-left-15 z-50 swiper-button-prev text-black hover:text-orange-500">
+                    <div className="absolute top-1/2 -translate-y-1/2 left-0 md:-left-15 z-50 swiper-button-prev text-black hover:text-pink-500">
                         <ChevronLeft size={24} />
                     </div>
-                    <div className="absolute top-1/2 -translate-y-1/2 right-0 md:-right-15 z-10 swiper-button-next text-black hover:text-orange-500">
+                    <div className="absolute top-1/2 -translate-y-1/2 right-0 md:-right-15 z-10 swiper-button-next text-black hover:text-pink-500">
                         <ChevronRight size={24} />
                     </div>
 
@@ -187,7 +169,6 @@ const CategoriesPage = () => {
                         }}
                         spaceBetween={40}
                         loop={true}
-
                         breakpoints={{
                             0: { slidesPerView: 2 },
                             640: { slidesPerView: 2 },
@@ -195,22 +176,44 @@ const CategoriesPage = () => {
                             1024: { slidesPerView: 4 },
                         }}
                     >
-                        {cardContent.map((item, index) => (
-                            <SwiperSlide key={index}>
-                                <div className="flex flex-col cursor-pointer mb-5 group">
-                                    <div className="relative bg-[#f5f5f5] h-72 overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:scale-101">
-                                        <img
-                                            src={item.image}
-                                            alt={item.category}
-                                            className="w-full h-40 object-contain"
-                                        />
+                        {categoryLoading
+                            ? Array.from({ length: 4 }).map((_, i) => (
+                                <SwiperSlide key={i}>
+                                    <SkeletonBox className="h-72 w-full mb-4" />
+                                    <SkeletonBox className="h-4 w-1/2" />
+                                </SwiperSlide>
+                            ))
+                            : categories?.map((item, index) => (
+                                <SwiperSlide key={index}>
+                                    <div className="flex flex-col cursor-pointer mb-5 group"
+                                        onClick={() => {
+                                            if (item?.Categories2?.length > 0) {
+                                                navigate("/categories", { state: { category: item } });
+                                                setSelectedSubCategory(null);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            } else {
+                                                navigate("/shop", { state: { category1: item?._id } });
+                                                setSelectedSubCategory(null);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }
+                                        }}
+                                    >
+                                        <div className="relative border border-[#f5f5f5] h-72 overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:scale-101">
+                                            <img
+                                                src={item.image}
+                                                alt={item?.Category1}
+                                                className="w-full h-40 object-contain"
+                                            />
+                                        </div>
+                                        <p className="app-text h-auto mt-2">Category</p>
+                                        <h3 className="text-sm text-gray-700 group-hover:text-pink-500 font-semibold mt-1">
+                                            {item?.Category1}
+                                        </h3>
                                     </div>
-                                    <p className="app-text h-auto mt-2">Category</p>
-                                    <h3 className="text-sm text-gray-700 group-hover:text-orange-500 font-semibold mt-1">{item.category}</h3>
-                                </div>
-                            </SwiperSlide>
-                        ))}
+                                </SwiperSlide>
+                            ))}
                     </Swiper>
+
                 </div>
             </div>
 
@@ -222,33 +225,34 @@ const CategoriesPage = () => {
 
                     {/* Column 1 */}
                     <div className="flex flex-row-reverse md:flex-row items-center justify-around md:justify-center py-10 px-6 gap-4 h-full">
-                        <Truck className="text-primary" size={50} />
+                        <Grid className="text-primary" size={50} />
                         <div>
-                            <h4 className="font-semibold text-gray-800 uppercase">Free Shipping</h4>
-                            <p className="text-sm text-gray-600 mt-1">On all orders of $150</p>
+                            <h4 className="font-semibold text-gray-800 uppercase">Certified Products</h4>
+                            <p className="text-sm text-gray-600 mt-1">Quality assured for your peace of mind</p>
                         </div>
                     </div>
 
                     {/* Column 2 */}
                     <div className="flex flex-row-reverse md:flex-row items-center justify-around md:justify-center py-10 px-6 gap-4 h-full">
-                        <Headset className="text-primary" size={50} />
+                        <Leaf className="text-primary" size={50} />
                         <div>
-                            <h4 className="font-semibold text-gray-800 uppercase">24/7 Support</h4>
-                            <p className="text-sm text-gray-600 mt-1">Get help when you need it</p>
+                            <h4 className="font-semibold text-gray-800 uppercase">1400+ Styles</h4>
+                            <p className="text-sm text-gray-600 mt-1">Wide selection to suit every preference</p>
                         </div>
                     </div>
 
                     {/* Column 3 */}
                     <div className="flex flex-row-reverse md:flex-row items-center justify-around md:justify-center py-10 px-6 gap-4 h-full">
-                        <Undo2 className="text-primary" size={50} />
+                        <Truck className="text-primary" size={50} />
                         <div>
-                            <h4 className="font-semibold text-gray-800 uppercase">100% Money Back</h4>
-                            <p className="text-sm text-gray-600 mt-1">30 day money back guarantee</p>
+                            <h4 className="font-semibold text-gray-800 uppercase">Fast & Reliable</h4>
+                            <p className="text-sm text-gray-600 mt-1">Swift delivery and dependable service</p>
                         </div>
                     </div>
 
                 </div>
             </div>
+
 
 
             <div className="bg-[#f5f5f5] py-16 md:py-30 relative overflow-hidden col-aligned-center">
@@ -270,6 +274,7 @@ const CategoriesPage = () => {
 
 
                         <OrangeOutlineButton
+                            className="mt-10"
                             label="Contact Us"
                             icon={<ArrowRight className="w-4 h-4" />}
                             onClick={() => console.log("Button clicked!")}

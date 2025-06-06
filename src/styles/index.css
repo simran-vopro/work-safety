@@ -19,7 +19,7 @@
 }
 
 .swiper-pagination-bullet-active {
-  @apply bg-orange-500;
+  @apply bg-pink-500;
 }
 
 
@@ -27,36 +27,37 @@
 
   @layer components {
     .text-primary {
-      @apply text-orange-500;
+      @apply text-pink-500;
     }
+
     .hover-item {
-      @apply hover:text-orange-500
+      @apply hover:text-pink-500
     }
 
     .bg-primary {
-      @apply bg-orange-500;
+      @apply bg-pink-500;
     }
 
     .border-primary {
-      @apply border-orange-500;
+      @apply border-pink-500;
     }
 
     .hover-primary {
-      @apply hover:text-orange-600;
+      @apply hover:text-pink-600;
     }
   }
 
 
   .container-padding {
-    @apply container mx-auto max-w-[1200px] px-4 sm:px-6 md:px-8;
+    @apply container mx-auto max-w-[1400px] px-4 sm:px-6 md:px-8;
   }
 
   .section-space {
-    @apply pt-10 md:pt-30 pb-10 md:pb-30;
+    @apply pt-10 md:pt-10 pb-10 md:pb-10;
   }
 
   .span-word {
-    @apply text-orange-400;
+    @apply text-pink-400;
   }
 
   .col-aligned-center {
@@ -73,8 +74,18 @@
 
   /* Navigation link with hover underline */
   .nav-link {
-    @apply relative text-gray-700 h-full flex items-center text-sm hover:text-orange-500;
+    @apply relative text-gray-700 h-full flex items-center text-sm hover:text-pink-500;
   }
+
+  .nav-link::before {
+    content: '';
+    @apply absolute -left-6 top-1/2 -translate-y-1/2 h-[2px] bg-pink-500 w-0 transition-all duration-300 ease-in-out pointer-events-none;
+  }
+
+  .nav-link:hover::before {
+    @apply w-4;
+  }
+
 
   .app-text {
     @apply relative text-gray-700 h-full flex items-center text-sm;
@@ -85,23 +96,31 @@
   }
 
 
-  .nav-link::before {
-    content: '';
-    @apply absolute -left-6 top-1/2 -translate-y-1/2 h-[2px] bg-orange-500 w-0 transition-all duration-300 ease-in-out pointer-events-none;
+
+
+
+  .nav-link-2 {
+    @apply relative text-gray-700 h-full flex items-center text-sm hover:text-pink-500;
   }
 
-  .nav-link:hover::before {
+  .nav-link-2::before {
+    content: '';
+    @apply absolute -left-6 top-1/2 -translate-y-1/2 h-[2px] bg-pink-500 w-0 transition-all duration-300 ease-in-out pointer-events-none;
+  }
+
+  .group:hover .nav-link-2::before {
     @apply w-4;
   }
 
+
   /* Icon button style */
   .icon-btn {
-    @apply w-4 h-4 cursor-pointer text-gray-700 text-sm hover:text-orange-500;
+    @apply w-4 h-4 cursor-pointer text-gray-700 text-sm hover:text-pink-500;
   }
 
   /* Primary button style (for reuse) */
   .btn-primary {
-    @apply bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded transition-colors duration-300;
+    @apply bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded transition-colors duration-300;
   }
 
 
@@ -112,7 +131,7 @@
 
   /* Footer social icon link */
   .footer-social-link {
-    @apply flex items-center space-x-2 text-gray-600 hover:text-orange-500 transition-colors duration-300;
+    @apply flex items-center space-x-2 text-gray-600 hover:text-pink-500 transition-colors duration-300;
   }
 
   /* Subscribe input */
@@ -122,7 +141,7 @@
 
   /* Subscribe button */
   .subscribe-button {
-    @apply h-12 bg-orange-400 hover:bg-orange-500 transition-colors text-white px-6 text-sm font-normal rounded-none flex-shrink-0;
+    @apply h-12 bg-pink-400 hover:bg-pink-500 transition-colors text-white px-6 text-sm font-normal rounded-none flex-shrink-0;
   }
 }
 
@@ -130,6 +149,10 @@
 
 @layer utilities {
   @media (min-width: 768px) and (max-width: 1250px) {
+    .container-padding {
+      @apply container mx-auto max-w-[1100px] px-4 sm:px-6 md:px-8;
+    }
+
     .container-padding-mid {
       @apply px-6;
     }

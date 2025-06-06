@@ -12,8 +12,6 @@ const AboutPage = () => {
                 <div className="container-padding container-padding-mid flex">
                     {/* Left Text Section */}
                     <div className="flex-2 py-5 md:py-30">
-
-
                         <p className="site-heading text-left mb-3 uppercase">
                             About Us
                         </p>
@@ -22,9 +20,6 @@ const AboutPage = () => {
                             Gear Up for Safety with Confidence
                         </p>
                         <div className="w-20 h-2 bg-primary rounded-sm my-5"></div>
-
-
-
 
                         <OrangeOutlineButton
                             label="Explore Products"

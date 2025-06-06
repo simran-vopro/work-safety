@@ -8,12 +8,15 @@ import OrangeOutlineButton from "../components/Button/OrangeOutlineButton";
 import ProductGrid from "../layouts/ProductGrid";
 import { useState } from "react";
 import useProducts from "../hooks/useProduct";
+import useFetch from "../hooks/useFetch";
+import { API_PATHS, IMAGE_URL } from "../utils/config";
+import useCategories from "../hooks/useCat";
+import { useNavigate } from "react-router-dom";
 
-const slides = [
-    { product: "Safety Boots", image: "/slider1.jpg" },
-    { product: "Work Gloves", image: "/slider1.jpg" },
-    { product: "Safety Helmet", image: "/slider1.jpg" },
-];
+interface bannerTypes {
+    title: string,
+    banner: string
+}
 
 interface Category {
     _id: string;
@@ -70,12 +73,21 @@ const reviews = [
 ];
 
 const HomePage = () => {
+    const navigate = useNavigate();
 
+    //home page products
     const [page, setPage] = useState(1);
     const limit = 20;
-
     const { products, productLoading, totalPages } = useProducts({ page, limit });
 
+    //top banners
+    const url = API_PATHS.TOP_BANNERS;
+    const { data } = useFetch<bannerTypes[]>(url);
+    const slides = data;
+
+    //top categories
+    const { categories, categoryLoading } = useCategories("Top");
+    const topCategories = categories;
 
     return (
         <div className="w-full relative bg-white">
@@ -94,28 +106,14 @@ const HomePage = () => {
                     }}
 
                 >
-                    {slides.map(() => (
+                    {slides?.map((item) => (
                         <SwiperSlide>
-                            <div
-                                className="relative h-[500px] md:h-[500px] bg-cover bg-center flex flex-col justify-center  text-gray-800"
-                                style={{ backgroundImage: `url(${images.new_arrivals})` }}
-                            >
-                                {/* <div className="container mx-auto flex flex-col justify-center items-center md:block">
-
-                                    <p className="text-primary text-sm md:text-base font-semibold">
-                                        {slide.product}
-                                    </p>
-                                    <p className="text-gray text-md md:text-lg mt-1">Trusted. Reliable. Durable.</p>
-                                    <p className="text-3xl md:text-5xl font-extrabold mt-2 uppercase">
-                                        Safety First
-                                    </p>
-                                    <OrangeOutlineButton
-                                        label="View More"
-                                        icon={<ArrowRight className="w-4 h-4" />}
-                                        onClick={() => console.log("Button clicked!")}
-                                    />
-                                </div> */}
-
+                            <div className="mx-auto relative h-[500px] md:h-[580px] w-full">
+                                <img
+                                    src={`${IMAGE_URL + item.banner}`}
+                                    alt="Banner"
+                                    className="w-full h-full object-fill"
+                                />
                             </div>
                         </SwiperSlide>
                     ))}
@@ -142,54 +140,11 @@ const HomePage = () => {
 
                 />
 
-
                 {/* Card Layout */}
                 <div>
                     <CardLayout
-                        cardContent={[
-                            {
-                                category: "Footwear Protection",
-                                totalPrducts: 20,
-                                tagLine: "Step into safety",
-                                image: images.feet,
-                            },
-                            {
-                                category: "Hand Protection",
-                                totalPrducts: 35,
-                                tagLine: "Grip with confidence",
-                                image: images.hand,
-                            },
-                            {
-                                category: "Head Protection",
-                                totalPrducts: 15,
-                                tagLine: "Think. Shield. Secure.",
-                                image: images.head,
-                            },
-                            {
-                                category: "Respiratory Protection",
-                                totalPrducts: 35,
-                                tagLine: "Breathe. Filter. Live.",
-                                image: images.respiratory,
-                            },
-                            {
-                                category: "Eye/Face Protection",
-                                totalPrducts: 35,
-                                tagLine: "See. Shield. Protect.",
-                                image: images.eye,
-                            },
-                            {
-                                category: "Hi-Vis Jackets",
-                                totalPrducts: 15,
-                                tagLine: "Bright. Bold. Visible.",
-                                image: images.jackets,
-                            },
-                            {
-                                category: "Customised Clothing",
-                                totalPrducts: 15,
-                                tagLine: "Fit. Style. Safety.",
-                                image: images.cloths,
-                            },
-                        ]}
+                        cardContent={topCategories}
+                        loading={categoryLoading}
                     />
                 </div>
             </div>
@@ -217,7 +172,7 @@ const HomePage = () => {
                             className="mt-10"
                             label="View More"
                             icon={<ArrowRight className="w-4 h-4" />}
-                            onClick={() => console.log("Button clicked!")}
+                            onClick={() => navigate("/about")}
                         />
                     </div>
                 </div>
@@ -244,32 +199,31 @@ const HomePage = () => {
                     description="Shop the best in safety and workplace essentials, featuring premium PPE, cleaning supplies, office organization, and more to power your productivity."
                 />
 
-                {
-                    productLoading ? "loading" : <>
-                        <ProductGrid products={products ?? []} gridCols={4} />
 
-                        {/* Pagination Controls */}
-                        <div className="flex justify-center mt-6 space-x-2">
-                            <button
-                                disabled={page === 1}
-                                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                                className="px-4 py-2 border rounded disabled:opacity-50"
-                            >
-                                Previous
-                            </button>
+                <ProductGrid products={products ?? []} loading={productLoading} gridCols={4} />
 
-                            <span className="px-4 py-2">{`Page ${page} of ${totalPages}`}</span>
 
-                            <button
-                                disabled={page === totalPages}
-                                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                                className="px-4 py-2 border rounded disabled:opacity-50"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </>
-                }
+                <div className="flex justify-center mt-20 space-x-2">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                        className="px-4 py-2 border text-sm rounded disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+
+                    <span className="px-4 py-2 text-sm">{`Page ${page} of ${totalPages}`}</span>
+
+                    <button
+                        disabled={page === totalPages}
+                        onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                        className="px-4 text-sm py-2 border rounded disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
+
+
             </div>
 
             <div className="bg-[#f5f5f5] relative">

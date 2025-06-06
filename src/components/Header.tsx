@@ -5,7 +5,6 @@ import {
   ShoppingCart,
   User,
   ChevronDown,
-  Heart,
   Truck,
   Phone,
   CreditCard,
@@ -23,12 +22,24 @@ import clsx from "clsx";
 import OrangeOutlineButton from "./Button/OrangeOutlineButton";
 import useCategories from "../hooks/useCat";
 import useProducts from "../hooks/useProduct";
+import images from "./imagesPath";
+import type { CartItem } from "../pages/cartPage";
 
-const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [shopOpen, setShopOpen] = useState(false);
+interface HeaderProps {
+  cartItems: CartItem[];
+  refreshCart: () => void;
+}
+
+
+const Header = ({ cartItems }: HeaderProps) => {
+
   const { pathname } = useLocation();
   const navigate = useNavigate();
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -50,90 +61,91 @@ const Header = () => {
     { name: "Contact", path: "/contact" },
   ];
 
-  const { categories, loading } = useCategories();
-
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [dropdownAlignments, setDropdownAlignments] = useState<
-    Record<number, "left" | "center" | "right">
-  >({});
-  const [hoveredSubCategory, setHoveredSubCategory] = useState<string>("");
-  const [subCategories, setSubCategories] = useState<string[]>([]);
-
-  const [search, setSearch] = useState("");
-
+  const { categories, categoryLoading } = useCategories();
   const { products, productLoading } = useProducts({ search });
 
-  console.log("search products ==>", products);
 
+
+  // Detect clicks outside the search container
   useEffect(() => {
-    if (!containerRef.current) return;
-    const newAlignments: Record<number, "left" | "center" | "right"> = {};
-    // Loop through each child category item
-    const items = containerRef.current.querySelectorAll(".category-item");
-    items.forEach((item, index) => {
-      const rect = item.getBoundingClientRect();
-      const screenWidth = window.innerWidth;
-
-      if (rect.left < 500) {
-        newAlignments[index] = "left";
-      } else if (rect.right > screenWidth - 500) {
-        newAlignments[index] = "right";
-      } else {
-        newAlignments[index] = "center";
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setSearch("");
       }
-    });
+    };
 
-    setDropdownAlignments(newAlignments);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   return (
     <>
       {/* Header */}
       <header className="w-full z-50 bg-white shadow">
         {/* Top Header */}
-        <div className="border-b border-gray-200 py-2 px-4 md:px-8 flex items-center justify-between gap-4 flex-wrap">
+        <div className="border-b border-gray-200 py-2 px-4 md:px-8 flex items-center justify-between gap-4 flex-wrap container-padding">
           {/* Logo */}
           <Link to="/" className="font-bold text-xxl md:text-2xl text-gray-800">
-            WorkSafety
-            <span className="w-1 h-1 bg-primary inline-block" />
+            <img src={images.logo} className="w-[170px] h-auto" />
           </Link>
 
           {/* Search Bar */}
-          <div className="flex-1 max-w-xl w-full">
-            <div className="relative border-b border-gray-300 focus-within:border-purple-500 transition-colors">
+          <div className="flex-1 max-w-xl w-full" ref={searchRef}>
+            <div className="flex items-center relative border-2 border-pink-400 focus-within:border-pink-500 transition-colors px-4 rounded-full">
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    navigate("/projectDetails", { state: products[0] });
+                    navigate(`/projectDetails/${products[0]._id}`);
                     setSearch("");
                   }
                 }}
                 type="text"
-                placeholder="Search Your Favourite Product..."
-                className="w-full bg-transparent focus:outline-none text-gray-500 text-lg md:text-sm py-2 pr-10 placeholder-gray-300 "
+                placeholder="Search products, product style codes..."
+                className="flex flex-1 w-full bg-transparent focus:outline-none text-gray-500 text-lg md:text-sm py-2 pr-10 placeholder-gray-300 "
               />
 
+              {/* icons */}
               {search ? (
                 <X
                   onClick={() => {
                     setSearch("");
                   }}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4 cursor-pointer"
+                  className=" text-gray-500 w-4 h-4 cursor-pointer"
                 />
               ) : (
-                <Search className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                <Search className=" text-gray-500 w-4 h-4" />
               )}
 
+
+              {search && productLoading && (
+                <div className="absolute top-10 left-0 bg-white border border-gray-300 w-full z-50 shadow-md mt-1 rounded-md p-2 space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-2 animate-pulse">
+                      <div className="w-8 h-8 bg-gray-300 rounded-full" />
+                      <div className="flex-1">
+                        <div className="w-3/4 h-3 bg-gray-300 mb-1 rounded" />
+                        <div className="w-1/2 h-3 bg-gray-200 rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+
               {search && products.length > 0 && (
-                <div className="absolute bg-white border border-gray-300 w-full z-50 shadow-md mt-1 rounded-md">
+                <div className="absolute top-10 left-0 bg-white border border-gray-300 w-full z-50 shadow-md mt-1 rounded-md max-h-[300px] overflow-y-scroll">
                   {products.map((product) => (
                     <div
                       key={product._id}
                       className="flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100"
                       onClick={() => {
-                        navigate("/projectDetails", { state: product });
+                        navigate(`/projectDetails/${product._id}`);
                         setSearch("");
                       }}
                     >
@@ -155,64 +167,75 @@ const Header = () => {
 
           {/* Icons */}
           <div className="flex items-center text-sm text-gray-700 divide-x divide-gray-300">
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer pr-4 text-gray-600 text-[12px]">
-              <Heart onClick={() => {
-                navigate("/cart")
-              }} className="w-4 h-4" />
+            <div
+              onClick={() => navigate("/cart")}
+              className="flex items-center gap-1 cursor-pointer pr-4 text-gray-600 text-[13px]"
+            >
+              <div className="relative">
+                <ShoppingCart className="w-4 h-4 text-pink-500" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -left-2 bg-pink-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                    {cartItems.length}
+                  </span>
+                )}
+              </div>
               <p>Saved</p>
             </div>
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[12px]">
-              <Bubbles className="w-4 h-4" />
+
+            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[13px]">
+              <Bubbles className="w-4 h-4 text-pink-500" />
               <p>Help & Information</p>
             </div>
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[12px]">
-              <User className="w-4 h-4" />
+            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[13px]">
+              <User className="w-4 h-4 text-pink-500" />
               <p>Your Account</p>
             </div>
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer pl-4 text-gray-600 text-[12px]">
-              <ShoppingCart className="w-4 h-4" />
-            </div>
+
           </div>
         </div>
 
         {/* Feature Icons Row */}
-        <div className="bg-gray-800 text-white px-4 md:px-8 py-2 flex flex-wrap justify-between text-[12px]">
-          <div className="flex items-center">
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
-              <Star className="w-4 h-4" />
-              <p>Shop Brands</p>
+        <div className="bg-[#d3d3d3] ">
+          <div className="container-padding text-black px-4 md:px-8 py-2 flex flex-wrap justify-between text-[13px]">
+            <div className="flex items-center">
+              <div onClick={() => navigate("/categories", {
+                state: { category: "allCategories" }
+              })} className="flex items-center gap-1 space-x-1 cursor-pointer pr-4">
+                <Star className="w-4 h-4" />
+                <p>Shop By Categories</p>
+              </div>
+              <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
+                <Phone className="w-4 h-4" />
+                <p>Call Mon - Fri 8am to 5pm on 0000 2222 5555 6666</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
-              <Phone className="w-4 h-4" />
-              <p>Call Mon - Fri 8am to 5pm on 0000 2222 5555 6666</p>
+            <div className="flex items-center">
+
+              <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
+                <Truck className="w-4 h-4" />
+                <p>Next Day Delivery Available</p>
+              </div>
+              <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
+                <LeafIcon className="w-4 h-4" />
+                <p>Environment  Friendly</p>
+              </div>
+              <OrangeOutlineButton
+                className="mt-0"
+                label="Shop Now"
+                icon={<ArrowRight className="w-4 h-4" />}
+                onClick={() => navigate("/shop")}
+              />
             </div>
           </div>
-          <div className="flex items-center">
-            <OrangeOutlineButton
-              className="mt-0"
-              label="Shop Now"
-              icon={<ArrowRight className="w-4 h-4" />}
-              onClick={() => navigate("/shop")}
-            />
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
-              <Truck className="w-4 h-4" />
-              <p>Next Day Delivery Available</p>
-            </div>
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4">
-              <Phone className="w-4 h-4" />
-              <p>Call Mon - Fri 8am to 5pm on 0000 2222 5555 6666</p>
-            </div>
-          </div>
+
         </div>
       </header>
 
       {/* Category Navigation */}
-      <div
-        ref={containerRef}
-        className="bg-[#d3d3d3] border-t border-b border-gray-200 flex flex-wrap justify-center gap-8 text-xs md:text-sm text-gray-700"
-      >
-        {loading // Skeleton loader
-          ? Array.from({ length: 8 }).map((_, idx) => (
+      <div className=" bg-gray-800 relative">
+        <div className="container-padding flex flex-wrap justify-between gap-8 text-xs md:text-sm text-white ">
+          {
+            categoryLoading ? Array.from({ length: 8 }).map((_, idx) => (
               <div
                 key={idx}
                 className="flex flex-col items-center space-y-2 py-4 px-2 animate-pulse"
@@ -221,152 +244,136 @@ const Header = () => {
                 <div className="w-16 h-3 bg-gray-600" />
               </div>
             ))
-          : categories &&
-            categories.map((cat, index) => {
-              const alignment = dropdownAlignments[index] || "center";
-
-              let dropdownClasses =
-                "absolute top-full mt-0 hidden group-hover:flex bg-white border border-gray-300 shadow-lg z-10 w-[90vw] max-w-[1100px] h-[600px] overflow-scroll p-4";
-
-              if (alignment === "left") {
-                dropdownClasses += " left-0";
-              } else if (alignment === "right") {
-                dropdownClasses += " right-0";
-              } else {
-                dropdownClasses += " left-1/2 -translate-x-1/2";
-              }
-
-              return (
-                <div
-                  key={cat.Category1}
-                  className="relative group flex flex-col items-center space-y-1 text-[12px] text-center cursor-pointer py-4 px-2 hover:bg-white category-item"
-                >
-                  <img src={cat.icon} className="w-10 h-10 mb-2" alt="" />
-
-                  {/* <span className="mb-2"></span> */}
-                  <p>{cat.Category1}</p>
-
-                  {/* Dropdown */}
+              : categories && categories.map((cat) => {
+                return (
                   <div
-                    className={`${dropdownClasses} opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out pointer-events-none group-hover:pointer-events-auto`}
+                    key={cat.Category1}
+                    className="group flex flex-col items-center space-y-1 text-[13px] text-center cursor-pointer py-2 px-2 hover:bg-[#fff] category-item"
                   >
-                    <div className="grid grid-cols-3 gap-4 w-full">
-                      <div className="col-span-2 text-left">
-                        <div className="bg-gray-50 border border-gray-400 p-3 px-10">
-                          <h4 className="font-semibold text-sm mb-5">
-                            Key Categories
-                          </h4>
-                          <ul className="grid grid-cols-4 gap-2">
-                            {cat?.Categories2.map((item, index) => (
-                              <li
-                                onMouseEnter={() => {
-                                  setSubCategories(item.Categories3),
-                                    setHoveredSubCategory(item.label);
-                                }}
-                                onMouseLeave={() => {
-                                  setSubCategories([]),
-                                    setHoveredSubCategory("");
-                                }}
-                                key={index}
-                                className="nav-link text-[12px]"
-                              >
-                                {item.label}
-                              </li>
+                    <div
+                      onClick={() => {
+                        if (cat?.Categories2?.length > 0) {
+                          navigate("/categories", {
+                            state: { category: cat }
+                          });
+                        } else {
+                          navigate("/shop", {
+                            state: { category1: cat._id }
+                          })
+                        }
+                      }} className="flex flex-row items-center">
+                      {/* <img src={cat.image} className="w-10 h-10 mb-2 rounded-full" alt="" /> */}
+
+                      <p className="font-semibold text-[13x] group-hover:text-pink-500 transition-colors duration-200 uppercase tracking-wide">
+                        {cat.Category1}</p>
+                      <ChevronDown className="group-hover:text-pink-500 pl-2"/>
+                    </div>
+
+                    {cat?.Categories2?.length > 0 && (
+                      <div
+                        className={`absolute top-full w-[70%] mt-0 group-hover:flex bg-[#fff] left-1/2 -translate-x-1/2 shadow-lg overflow-auto p-4 opacity-0 z-50 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 ease-out pointer-events-none group-hover:pointer-events-auto`}
+                      >
+
+                        <div className="w-full p-3 max-h-[500px] overflow-y-auto">
+                          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 gap-4 space-y-4">
+
+
+                            {cat?.Categories2.map((cat2, index) => (
+                              <div key={index} className="break-inside-avoid mb-5">
+                                <p
+                                  onClick={() => {
+                                    if (cat2?.Categories3?.length > 0) {
+                                      navigate("/categories", {
+                                        state: {
+                                          category: cat,
+                                          activeSubCategory: cat2,
+                                        },
+                                      });
+                                      window.scrollTo({ top: 0, behavior: "smooth" });
+                                    } else {
+                                      navigate("/shop", {
+                                        state: { category1: cat._id, category2: cat2._id },
+                                      });
+                                      window.scrollTo({ top: 0, behavior: "smooth" });
+                                    }
+                                  }}
+                                  className="text-[13px] font-semibold uppercase mb-2 text-left nav-link h-auto"
+                                >
+                                  {cat2.label}
+                                </p>
+
+                                <ul>
+                                  {cat2.Categories3?.map((item) => (
+                                    <li
+                                      onClick={() => {
+                                        navigate("/shop", {
+                                          state: {
+                                            category1: cat?._id,
+                                            category2: cat2?._id,
+                                            category3: item._id,
+                                          },
+                                        });
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                      }}
+                                      key={item._id}
+                                      className="nav-link text-[13px] font-normal mb-1"
+                                    >
+                                      {item.Category3}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
                             ))}
-                          </ul>
+                          </div>
                         </div>
 
-                        {((cat.allCategories3 &&
-                          cat.allCategories3.length > 0) ||
-                          (subCategories && subCategories.length > 0)) && (
-                          <div className="bg-gray-50 border border-t-0 border-gray-400 p-3 px-10">
-                            {subCategories.length > 0 ? (
-                              <>
-                                <h4 className="font-semibold text-sm mb-5">
-                                  {hoveredSubCategory}
-                                </h4>
-                                <ul className="grid grid-cols-4 gap-2">
-                                  {subCategories?.map((item) => (
-                                    <li
-                                      key={item}
-                                      className="nav-link text-[12px]"
-                                    >
-                                      {item}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </>
-                            ) : (
-                              <>
-                                <h4 className="font-semibold text-sm mb-5">
-                                  All Products
-                                </h4>
-                                <ul className="grid grid-cols-4 gap-2">
-                                  {cat?.allCategories3.map((item) => (
-                                    <li
-                                      key={item}
-                                      className="nav-link text-[12px]"
-                                    >
-                                      {item}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
 
-                      <div className="col-span-1">
-                        <img
-                          src={cat.image}
-                          alt={cat.Category1}
-                          className="w-full h-auto object-cover"
-                        />
                       </div>
-                    </div>
+                    )}
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+          }</div>
       </div>
 
       {/* Bottom Info Bar */}
-      <div className="bg-blue-50 py-3 px-4 md:px-8 flex flex-wrap justify-center gap-6 text-sm text-gray-700">
-        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]">
-          <CreditCard className="w-4 h-4" />
-          <p>Instant Credit</p>
+      < div className="bg-blue-50 py-3 px-4 md:px-8 flex flex-wrap justify-center gap-6 text-sm text-gray-700" >
+        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[13px]">
+          <CreditCard className="w-4 h-4 text-pink-500" />
+          <p className="uppercase font-semibold text-sm">Credit Accounts</p>
         </div>
 
-        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]">
-          <Flag className="w-4 h-4" />
-          <p>Shop UK Made</p>
+        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[13px]">
+          <Flag className="w-4 h-4 text-pink-500" />
+          <p className="uppercase font-semibold text-sm">Certified Products</p>
         </div>
-        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]">
-          <LeafIcon className="w-4 h-4" />
-          <p>Shop Environmentally Responsible</p>
+        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[13px]">
+          <LeafIcon className="w-4 h-4 text-pink-500" />
+          <p className="uppercase font-semibold text-sm">1400+ Style</p>
         </div>
-        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]">
-          <BellElectric className="w-4 h-4" />
-          <p>Shop Energy Saving</p>
+        <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[13px]">
+          <BellElectric className="w-4 h-4 text-pink-500" />
+          <p className="uppercase font-semibold text-sm">Fast & Reliable</p>
         </div>
         <div
           onClick={() => {
             navigate("about");
           }}
-          className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[12px]"
+          className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-[13px]"
         >
-          <Info className="w-4 h-4" />
-          <p>About Us</p>
+          <Info className="w-4 h-4 text-pink-500" />
+          <p className="uppercase font-semibold text-sm">About Us</p>
         </div>
-      </div>
+      </div >
 
       {/* Sidebar Menu (Mobile) */}
-      <div
-        className={clsx(
-          "fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300",
-          menuOpen ? "translate-x-0" : "-translate-x-full"
-        )}
+      < div
+        className={
+          clsx(
+            "fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300",
+            menuOpen ? "translate-x-0" : "-translate-x-full"
+          )
+        }
       >
         <div className="flex flex-col h-full">
           <div className="flex flex-col h-full p-6 space-y-6">
@@ -450,15 +457,17 @@ const Header = () => {
             My Account
           </Link>
         </div>
-      </div>
+      </div >
 
       {/* Overlay */}
-      {menuOpen && (
-        <div
-          onClick={() => setMenuOpen(false)}
-          className="fixed inset-0 bg-opacity-40 z-40"
-        />
-      )}
+      {
+        menuOpen && (
+          <div
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 bg-opacity-40 z-40"
+          />
+        )
+      }
     </>
   );
 };

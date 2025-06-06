@@ -1,14 +1,21 @@
-
 import * as React from "react";
 
-interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> { }
 
-export const Checkbox: React.FC<CheckboxProps> = ({ ...props }) => {
+export const Checkbox: React.FC<CheckboxProps> = ({ checked, ...props }) => {
   return (
-    <input
-      type="checkbox"
-      className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-purple-500"
-      {...props}
-    />
+    <label className="inline-flex items-center cursor-pointer">
+      <input
+        type="checkbox"
+        checked={checked}
+        className="sr-only peer"
+        {...props}
+      />
+      <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-primary peer-checked:bg-transparent flex items-center justify-center">
+        {/* Custom inner box or icon */}
+        {checked ? <div className="w-3 h-3 bg-primary rounded-sm peer-checked:block" /> : <></>}
+
+      </div>
+    </label>
   );
 };

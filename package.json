@@ -16,6 +16,8 @@
     "lucide-react": "^0.511.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-hot-toast": "^2.5.2",
+    "react-inner-image-zoom": "^4.0.1",
     "react-router-dom": "^7.6.1",
     "swiper": "^11.2.8",
     "tailwindcss": "^4.1.7"

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { API_PATHS } from '../utils/config';
 import useFetch from './useFetch';
 
@@ -25,7 +24,10 @@ export interface ProductType {
     ManufacturerCode: string;
     ISPCCombined: number;
     VATCode: number;
-    Brand: string;
+    Brand: {
+        _id: string,
+        Brand: string
+    };
     ExtendedCharacterDesc: string;
     CatalogueCopy: string;
     "Image Ref": string;
@@ -36,28 +38,46 @@ export interface ProductType {
 }
 
 
-
 type UseProductsOptions = {
     search?: string;
     page?: number;
     limit?: number;
+    category1?: any;
+    category2?: any;
+    category3?: any;
+    brand?: any;
 };
 
-
 const useProducts = (options: UseProductsOptions = {}) => {
-
-
     const {
         search = "",
         page = 1,
         limit = 20,
+        category1,
+        category2,
+        category3,
+        brand
     } = options;
 
-    const { data, loading: productLoading, error, total } = useFetch<ProductType[]>(API_PATHS.PRODUCTS, {
+
+    // ✅ Remove undefined values before passing to useFetch
+    const queryParams: Record<string, any> = {
         page,
         limit,
-        search,
-    });
+        search
+    };
+
+    if (category1) queryParams.category1 = category1;
+    if (category2) queryParams.category2 = category2;
+    if (category3) queryParams.category3 = category3;
+    if (brand) queryParams.brand = brand;
+
+    const {
+        data,
+        loading: productLoading,
+        error,
+        total
+    } = useFetch<ProductType[]>(API_PATHS.PRODUCTS, queryParams);
 
     const products = data ?? [];
     const totalPages = Math.ceil(total / limit);
@@ -67,9 +87,8 @@ const useProducts = (options: UseProductsOptions = {}) => {
         productLoading,
         error,
         total,
-        totalPages,
+        totalPages
     };
 };
-
 
 export default useProducts;

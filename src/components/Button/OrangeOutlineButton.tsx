@@ -3,7 +3,7 @@ import React from "react";
 interface OrangeOutlineButtonProps {
   label: string;
   icon?: React.ReactNode;
-  onClick?: () => void;
+  onClick: () => void | Promise<void>;
   className?: string;
   type?: "button" | "submit" | "reset";
 }

@@ -1,33 +1,58 @@
-// src/router/AppRouter.tsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import MainLayout from "../layouts/MainLayout";
-import HomePage from "../pages/HomePage";
-import AboutPage from "../pages/AboutPage";
+import { useEffect, useState } from "react";
+import SiteLoader from "../components/SiteLoader";
 
-import SearchPage from "../pages/SearchPage";
-import NewsletterPage from "../pages/AccountPage";
-import CategoriesPage from "../pages/CategoriesPage";
-import ShopPage from "../pages/ShopPage";
-import ProjectDetails from "../pages/products/details";
-import CartPage from "../pages/cartPage";
-import ContactPage from "../pages/contactPage";
+export const ScrollToTop = () => {
+  const location = useLocation();
 
-const AppRouter = () => (
-  <BrowserRouter>
-    <MainLayout>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/account" element={<NewsletterPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/shop" element={<ShopPage />} />
-        <Route path="/projectDetails" element={<ProjectDetails />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-      </Routes>
-    </MainLayout>
-  </BrowserRouter>
-);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
+
+  return null;
+};
+
+const AppRouter = () => {
+  const [loading, setLoading] = useState(true);
+  const [hideLoader, setHideLoader] = useState(false); // controls slide up
+
+  useEffect(() => {
+    if (loading) {
+      // Add overflow hidden and padding-right to compensate for scrollbar width
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = "hidden";
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    } else {
+      // Reset styles
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHideLoader(true); // start slide up animation
+    }, 3000);
+
+    const cleanup = setTimeout(() => {
+      setLoading(false); // hide loader completely after animation duration
+    }, 3000); // 600ms animation duration
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(cleanup);
+    };
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <MainLayout />
+      {loading && <SiteLoader hide={hideLoader} />}
+      <Toaster />
+    </BrowserRouter>
+  );
+};
 
 export default AppRouter;
