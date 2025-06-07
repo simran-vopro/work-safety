@@ -2,6 +2,9 @@ import React from "react";
 import { ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { ProductType } from "../hooks/useProduct";
+import axios from "axios";
+import { API_PATHS } from "../utils/config";
+import { getSessionId } from "../pages/products/details";
 
 type ProductGridProps = {
   products: ProductType[];
@@ -20,6 +23,9 @@ const SkeletonCard = () => (
     <div className="mt-1 h-5 bg-gray-300 rounded w-2/3"></div>
   </div>
 );
+
+
+
 
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products, gridCols, loading }) => {
@@ -49,10 +55,9 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, gridCols, loading }
                   className="w-full h-40 object-contain"
                 />
                 {/* Icons container */}
-                <div className="absolute top-5 right-5 h-full flex flex-col items-center justify-start gap-6 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <ShoppingCart className="text-gray-900 text-sm cursor-pointer group-hover:text-white " />
-                  {/* <Heart className="text-gray-900 text-3xl cursor-pointer group-hover:text-pink-500" /> */}
-                </div>
+                {/* <div className="absolute top-5 right-5 h-auto rounded-full flex flex-col items-center justify-start gap-6 p-2 opacity-0 group-hover:opacity-100 group-hover:bg-pink-500 transition-opacity duration-300">
+                  <ShoppingCart className="text-gray-900 text-sm cursor-pointer group-hover:text-white" />
+                </div> */}
               </div>
 
               <p className="app-text h-auto mt-2">

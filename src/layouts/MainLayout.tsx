@@ -26,12 +26,11 @@ function MainLayout() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showBanner, setShowBanner] = useState(true);
 
-
   useEffect(() => {
     fetchData();
   }, []);
 
-  const { cartdata, fetchData } = useCart()
+  const { cartdata, fetchData } = useCart();
 
   useEffect(() => {
     if (cartdata?.[0]?.items) {
@@ -44,13 +43,13 @@ function MainLayout() {
   };
 
   interface floatingBannerType {
-    _id: string,
-    title: string,
-    description: string,
-    imageUrl: string,
+    _id: string;
+    title: string;
+    description: string;
+    imageUrl: string;
   }
 
-  const url = API_PATHS.GET_FLOATING_BANNER
+  const url = API_PATHS.GET_FLOATING_BANNER;
   const { data } = useFetch<floatingBannerType>(url);
 
   return (
@@ -65,10 +64,16 @@ function MainLayout() {
           <Route path="/account" element={<NewsletterPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/shop" element={<ShopPage />} />
-          <Route path="/projectDetails/:productId" element={<ProjectDetails refreshCart={refreshCart} />} />
+          <Route
+            path="/projectDetails/:productId"
+            element={<ProjectDetails refreshCart={refreshCart} />}
+          />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/confirm-order/:orderId" element={<OrderConfirmationPage />} />
+          <Route
+            path="/confirm-order/:orderId"
+            element={<OrderConfirmationPage />}
+          />
           <Route path="/terms" element={<TermsPage />} />
         </Routes>
       </main>
@@ -98,10 +103,10 @@ function MainLayout() {
           />
 
           <div className="flex flex-col items-center justify-center flex-grow p-3">
-            <h3 className="font-semibold text-lg mb-1 p-0 uppercase">{data?.title}</h3>
-            <p className="text-center text-[12px]">
-              {data?.description}
-            </p>
+            <h3 className="font-semibold text-lg mb-1 p-0 uppercase">
+              {data?.title}
+            </h3>
+            <p className="text-center text-[12px]">{data?.description}</p>
             {/* <OrangeOutlineButton
         label="Shop Now"
         onClick={() => console.log("clicked")}
@@ -109,10 +114,6 @@ function MainLayout() {
           </div>
         </div>
       )}
-
-
-
-
     </div>
   );
 }
