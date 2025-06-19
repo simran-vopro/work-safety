@@ -6,20 +6,23 @@ interface OrangeOutlineButtonProps {
   onClick: () => void | Promise<void>;
   className?: string;
   type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 const OrangeOutlineButton: React.FC<OrangeOutlineButtonProps> = ({
   label,
   icon,
   onClick,
+  disabled,
   className = "",
   type = "button",
 }) => {
   return (
     <button
+      disabled={disabled}
       type={type}
       onClick={onClick}
-      className={`relative overflow-hidden flex items-center gap-2 border border-primary text-primary px-4 py-2 font-semibold w-fit group ${className}`}
+      className={`cursor-pointer relative overflow-hidden flex items-center gap-2 border border-primary text-primary px-4 py-2 font-semibold w-fit group ${className}`}
     >
       <span
         className="absolute inset-0 bg-primary transform -translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0"

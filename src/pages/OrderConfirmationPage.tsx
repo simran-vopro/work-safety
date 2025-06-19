@@ -3,9 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import useFetch from "../hooks/useFetch";
 import { API_PATHS } from "../utils/config";
-import { getSessionId } from "./products/details";
 import toast from "react-hot-toast";
-import { Copy } from "lucide-react";
+import { CheckCircle, Copy } from "lucide-react";
+import { getUserId } from "../utils/createGuestUserId";
 
 interface Product {
   _id: string;
@@ -15,6 +15,7 @@ interface Product {
   image: string;
   quantity: number;
   unitPrice: number;
+  totalPrice: number
 }
 
 interface OrderData {
@@ -28,22 +29,25 @@ interface OrderData {
   city: string;
   postcode: string;
   company: string;
-  sessionId: string;
+  userId: string;
   message: string;
   products: Product[];
   status: string;
   createdAt: string;
   updatedAt: string;
+  subtotal: number;
+  total: number;
+  tax: number;
   __v: number;
 }
 
 const OrderConfirmationPage = () => {
   const { orderId } = useParams();
-  const sessionId = getSessionId();
+  const userId = getUserId();
   const navigate = useNavigate();
 
   const url = `${API_PATHS.GET_ORDER}/${orderId}`;
-  const { data, loading } = useFetch<OrderData>(url, { sessionId });
+  const { data, loading } = useFetch<OrderData>(url, { userId });
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -83,13 +87,6 @@ const OrderConfirmationPage = () => {
     }
   }, [data]);
 
-  const subtotal =
-    data?.products?.reduce(
-      (acc, item) => acc + item.unitPrice * item.quantity,
-      0
-    ) ?? 0;
-  const tax = subtotal * 0.18;
-  const total = subtotal + tax;
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -102,8 +99,18 @@ const OrderConfirmationPage = () => {
     setTermsChecked(e.target.checked);
   };
 
+
+  const [isCopied, setIsCopied] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsCopied(false);
+    }, 2000);
+  }, [isCopied])
+
   const copyBillingToInvoice = () => {
     setFormData((prev) => ({ ...prev, invoiceAddress: prev.address }));
+    setIsCopied(true);
   };
 
   // Step 1 button
@@ -115,7 +122,7 @@ const OrderConfirmationPage = () => {
   // Final submit
   const handleFinalSubmit = async () => {
     if (!termsChecked) {
-      alert("Please agree to the Terms & Conditions before placing order.");
+      toast.error("Please agree to the Terms & Conditions before placing order.")
       return;
     }
 
@@ -123,8 +130,8 @@ const OrderConfirmationPage = () => {
     try {
       const payload = {
         ...formData,
-        status: "Confirmed",
-        sessionId,
+        status: "Order Received",
+        userId,
       };
       const editOrder = `${API_PATHS.EDIT_ORDER}/${orderId}`;
       await axios.put(editOrder, payload);
@@ -181,10 +188,11 @@ const OrderConfirmationPage = () => {
                 <div className="flex-1">
                   <h4 className="font-medium">{item.description}</h4>
                   <p className="text-xs text-gray-500">Code: {item.code}</p>
+                  <p className="text-xs text-gray-500">Price: {item.unitPrice}</p>
                   <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                 </div>
                 <div className="text-right text-sm font-medium text-gray-800">
-                  ₹{(item.unitPrice * item.quantity).toFixed(2)}
+                  £{item.totalPrice.toFixed(2)}
                 </div>
               </div>
             ))
@@ -196,15 +204,15 @@ const OrderConfirmationPage = () => {
           <div className="space-y-2 text-sm text-gray-700 font-medium">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>₹{subtotal.toFixed(2)}</span>
+              <span>£{data.subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span>VAT (18%)</span>
-              <span>₹{tax.toFixed(2)}</span>
+              <span>VAT (20%)</span>
+              <span>£{data.tax.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-base font-bold text-gray-900 mt-2">
               <span>Total</span>
-              <span>₹{total.toFixed(2)}</span>
+              <span>£{data.total.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -213,235 +221,244 @@ const OrderConfirmationPage = () => {
         <div className="w-full lg:w-2/3 p-6">
           {step === 1 ? (
             <>
-             <h2 className="text-xl font-semibold mb-6 text-gray-800">
-            Confirm Your Details
-          </h2>
-          <form className="space-y-4" onSubmit={handleConfirmClick}>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="firstName"
-                  className="block text-sm font-medium mb-1"
-                >
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  className="w-full border p-2 rounded"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="lastName"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  className="w-full border p-2 rounded"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
+              <h2 className="text-xl font-semibold mb-6 text-gray-800">
+                Confirm Your Details
+              </h2>
+              <form className="space-y-4" onSubmit={handleConfirmClick}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="firstName"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      className="w-full border p-2 rounded"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="lastName"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      className="w-full border p-2 rounded"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label
-                htmlFor="company"
-                className="block text-sm font-medium mb-1"
-              >
-                Company Name
-              </label>
-              <input
-                type="text"
-                id="company"
-                name="company"
-                className="w-full border p-2 rounded"
-                value={formData.company}
-                onChange={handleInputChange}
-              />
-            </div>
+                <div>
+                  <label
+                    htmlFor="company"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    className="w-full border p-2 rounded"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                  />
+                </div>
 
 
-            <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className="w-full border p-2 rounded"
-                value={formData.email}
-                onChange={handleInputChange}
-              />
-            </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      className="w-full border p-2 rounded"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium mb-1">
-                Phone
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                className="w-full border p-2 rounded"
-                value={formData.phone}
-                onChange={handleInputChange}
-              />
-            </div>
-            </div>
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-medium mb-1">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      className="w-full border p-2 rounded"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label
-                htmlFor="address"
-                className="block text-sm font-medium mb-1"
-              >
-                Billing Address
-              </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                className="w-full border p-2 rounded"
-                value={formData.address}
-                onChange={handleInputChange}
-              />
-            </div>
+                <div>
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Billing Address
+                  </label>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    className="w-full border p-2 rounded"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                  />
+                </div>
 
-            <div>
-              <label
-                htmlFor="address2"
-                className="block text-sm font-medium mb-1"
-              >
-                Billing Address 2 (Optional)
-              </label>
-              <input
-                type="text"
-                id="address2"
-                name="address2"
-                className="w-full border p-2 rounded"
-                value={formData.address2}
-                onChange={handleInputChange}
-              />
-            </div>
+                <div>
+                  <label
+                    htmlFor="address2"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Billing Address 2 (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="address2"
+                    name="address2"
+                    className="w-full border p-2 rounded"
+                    value={formData.address2}
+                    onChange={handleInputChange}
+                  />
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="city"
-                  className="block text-sm font-medium mb-1"
-                >
-                  City
-                </label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  className="w-full border p-2 rounded"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="postcode"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Postcode
-                </label>
-                <input
-                  type="text"
-                  id="postcode"
-                  name="postcode"
-                  className="w-full border p-2 rounded"
-                  value={formData.postcode}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="city"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      id="city"
+                      name="city"
+                      className="w-full border p-2 rounded"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="postcode"
+                      className="block text-sm font-medium mb-1"
+                    >
+                      Postcode
+                    </label>
+                    <input
+                      type="text"
+                      id="postcode"
+                      name="postcode"
+                      className="w-full border p-2 rounded"
+                      value={formData.postcode}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label
-                htmlFor="invoiceAddress"
-                className="block text-sm font-medium mb-1 flex items-center justify-between"
-              >
-                Invoice Address
+                <div>
+                  <label
+                    htmlFor="invoiceAddress"
+                    className="block text-sm font-medium mb-1 flex items-center justify-between"
+                  >
+                    Invoice Address
+                    <button
+                      type="button"
+                      className="text-blue-600 hover:underline flex items-center gap-1"
+                      onClick={copyBillingToInvoice}
+                    >
+                      <Copy size={16} /> Use Billing Address
+                    </button>
+                  </label>
+                  <input
+                    type="text"
+                    id="invoiceAddress"
+                    name="invoiceAddress"
+                    className="w-full border p-2 rounded"
+                    value={formData.invoiceAddress}
+                    onChange={handleInputChange}
+                  />
+                  {
+                    isCopied && <>
+                      <label
+                        htmlFor="invoiceAddress"
+                        className="text-pink-600 flex items-center gap-1 text-sm mt-1"
+                      >
+                        <CheckCircle size={14} />  Billing address copied
+                      </label>
+                    </>
+                  }
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="poNumber"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    PO Number (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="poNumber"
+                    name="poNumber"
+                    className="w-full border p-2 rounded"
+                    value={formData.poNumber}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="deliveryInstructions"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Delivery Instructions
+                  </label>
+                  <textarea
+                    id="deliveryInstructions"
+                    name="deliveryInstructions"
+                    rows={3}
+                    className="w-full border p-2 rounded"
+                    value={formData.deliveryInstructions}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+
+
                 <button
-                  type="button"
-                  className="text-blue-600 hover:underline flex items-center gap-1"
-                  onClick={copyBillingToInvoice}
+                  type="submit"
+                  disabled={submitting}
+                  className={`w-full py-3 rounded text-white transition ${submitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                    }`}
                 >
-                  <Copy size={16} /> Copy from Billing
+                  {submitting ? "Confirming..." : "Confirm Order"}
                 </button>
-              </label>
-              <input
-                type="text"
-                id="invoiceAddress"
-                name="invoiceAddress"
-                className="w-full border p-2 rounded"
-                value={formData.invoiceAddress}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="poNumber"
-                className="block text-sm font-medium mb-1"
-              >
-                PO Number (Optional)
-              </label>
-              <input
-                type="text"
-                id="poNumber"
-                name="poNumber"
-                className="w-full border p-2 rounded"
-                value={formData.poNumber}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="deliveryInstructions"
-                className="block text-sm font-medium mb-1"
-              >
-                Delivery Instructions
-              </label>
-              <textarea
-                id="deliveryInstructions"
-                name="deliveryInstructions"
-                rows={3}
-                className="w-full border p-2 rounded"
-                value={formData.deliveryInstructions}
-                onChange={handleInputChange}
-              />
-            </div>
-
-           
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className={`w-full py-3 rounded text-white transition ${
-                submitting
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
-            >
-              {submitting ? "Confirming..." : "Confirm Order"}
-            </button>
-          </form>
+              </form>
             </>
           ) : (
             <>
@@ -449,10 +466,40 @@ const OrderConfirmationPage = () => {
                 Review & Place Order
               </h2>
               <p className="text-sm text-gray-600 mb-4">
+                By confirming the order, the customer acknowledges acceptance of these Terms of Sale.
+                <br /><br />
+
+                <strong>Terms of Sale</strong><br /><br />
+
+                <strong>Order Confirmation</strong><br />
+                All orders must be formally confirmed by the customer, providing clear consent to proceed.
+                Where a Purchase Order (PO) is required, it must be supplied prior to processing the order and arranging payment.
+                <br /><br />
+
+                <strong>Supplier Set-Up</strong><br />
+                To ensure a smooth transaction, the customer should advise us of any supplier set-up requirements or processes—
+                either prior to order confirmation or immediately thereafter.
+                <br /><br />
+
+                <strong>Returns Policy</strong><br />
+                Orders, once processed, are non-returnable. We therefore request that customers review product codes and
+                specifications carefully prior to confirming the order.
+                <br /><br />
+
+                <strong>Delivery Terms</strong><br />
+                Orders will be processed and despatched with next working day delivery as standard (unless otherwise requested),
+                subject to stock availability and any unforeseen circumstances outside our control.
+                <br /><br />
+
+                <strong>Delivery & Invoicing Details</strong><br />
+                At the time of order confirmation, the customer must provide and verify the correct delivery address and invoicing
+                details, along with any specific delivery instructions where applicable.
+                <br /><br />
+
                 By placing this order, you agree to our{" "}
                 <span
                   className="text-blue-600 underline cursor-pointer"
-                  onClick={() => navigate("/terms")}
+                  onClick={() => window.open("/terms", "_blank")}
                 >
                   Terms & Conditions
                 </span>
@@ -480,11 +527,10 @@ const OrderConfirmationPage = () => {
                   Back
                 </button>
                 <button
-                  className={`flex-1 py-3 rounded text-white transition ${
-                    submitting
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700"
-                  }`}
+                  className={`flex-1 py-3 rounded text-white transition ${submitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                    }`}
                   onClick={handleFinalSubmit}
                   disabled={submitting}
                 >

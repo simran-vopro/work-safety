@@ -24,6 +24,7 @@ import useCategories from "../hooks/useCat";
 import useProducts from "../hooks/useProduct";
 import images from "./imagesPath";
 import type { CartItem } from "../pages/cartPage";
+import { useAuth } from "../hooks/useAuth";
 
 interface HeaderProps {
   cartItems: CartItem[];
@@ -58,7 +59,7 @@ const Header = ({ cartItems }: HeaderProps) => {
       ],
     },
     { name: "Categories", path: "/categories" },
-    { name: "Contact", path: "/contact" },
+    { name: "Contact", path: "/sendQuotation" },
   ];
 
   const { categories, categoryLoading } = useCategories();
@@ -81,6 +82,7 @@ const Header = ({ cartItems }: HeaderProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const { token } = useAuth();
 
   return (
     <>
@@ -150,7 +152,7 @@ const Header = ({ cartItems }: HeaderProps) => {
                       }}
                     >
                       <img
-                        src={product["Image Ref"]}
+                        src={product.ImageRef}
                         alt={product.Description}
                         className="w-8 h-8 rounded-full object-cover"
                       />
@@ -182,13 +184,19 @@ const Header = ({ cartItems }: HeaderProps) => {
               <p>Saved</p>
             </div>
 
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[13px]">
+            <div onClick={() => navigate("/terms")} className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[13px]">
               <Bubbles className="w-4 h-4 text-pink-500" />
-              <p>Help & Information</p>
+              <p>Terms & Conditions</p>
             </div>
-            <div className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[13px]">
+            <div onClick={() => {
+              if (token) {
+                navigate("/profile");
+              } else {
+                navigate("/login")
+              }
+            }} className="flex items-center gap-1 space-x-1 cursor-pointer px-4 text-gray-600 text-[13px]">
               <User className="w-4 h-4 text-pink-500" />
-              <p>Your Account</p>
+              <p>{token ? "My Account" : "Login"}</p>
             </div>
 
           </div>
@@ -266,7 +274,7 @@ const Header = ({ cartItems }: HeaderProps) => {
 
                       <p className="font-semibold text-[13x] group-hover:text-pink-500 transition-colors duration-200 uppercase tracking-wide">
                         {cat.Category1}</p>
-                      <ChevronDown className="group-hover:text-pink-500 pl-2"/>
+                      <ChevronDown className="group-hover:text-pink-500 pl-2" />
                     </div>
 
                     {cat?.Categories2?.length > 0 && (

@@ -10,20 +10,7 @@ import axios from "axios";
 import { API_PATHS } from "../../utils/config";
 import type { ProductType } from "../HomePage";
 import useFetch from "../../hooks/useFetch";
-// import toast from "react-hot-toast";
-
-
-// Generate or retrieve the session ID
-export function getSessionId() {
-  let sessionId = localStorage.getItem("sessionId");
-  if (!sessionId) {
-    sessionId = crypto.randomUUID(); // Built-in in modern browsers
-    localStorage.setItem("sessionId", sessionId);
-  }
-  return sessionId;
-}
-
-
+import { getUserId } from "../../utils/createGuestUserId";
 
 
 interface ProductDetailsPageProps {
@@ -34,6 +21,7 @@ const ProjectDetails = ({ refreshCart }: ProductDetailsPageProps) => {
   const [activeTab, setActiveTab] = useState<"description" | "technical">(
     "description"
   );
+
   const [quantity, setQuantity] = useState<number>(1);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,20 +32,18 @@ const ProjectDetails = ({ refreshCart }: ProductDetailsPageProps) => {
   const { productId } = useParams();
 
   const url = `${API_PATHS.GET_PRODUCT}/${productId}`;
-  const { data } = useFetch<ProductType>(url);
+  const { data, loading } = useFetch<ProductType>(url);
   const product = data;
-
-  console.log("product details ==> ", product);
 
   const navigate = useNavigate();
 
   // Add product to cart (send to backend)
   async function handleAddToCart() {
-    const sessionId = getSessionId();
+    const userId = getUserId();
 
     try {
       const response = await axios.post(API_PATHS.ADD_TO_CART, {
-        sessionId,
+        userId,
         productId: product?._id,
         quantity
       });
@@ -66,16 +52,63 @@ const ProjectDetails = ({ refreshCart }: ProductDetailsPageProps) => {
         navigate("/cart");
       }
 
-      await refreshCart();
+      refreshCart();
     } catch (error) {
       console.log("Cart error:", error);
     }
   }
 
+  const ProductDetailSkeleton = () => {
+    return (
+      <div className="container-padding section-space grid grid-cols-1 lg:grid-cols-2 gap-10 animate-pulse">
+        {/* Left: Image Section */}
+        <div>
+          <div className="w-full h-[400px] bg-gray-200 rounded" />
+          <div className="flex gap-2 mt-4">
+            <div className="w-24 h-24 bg-gray-200 rounded p-1" />
+          </div>
+        </div>
+
+        {/* Right: Details Section */}
+        <div>
+          <div className="w-3/4 h-6 bg-gray-200 rounded mb-4" />
+          <div className="w-1/3 h-4 bg-gray-200 rounded mb-6" />
+
+          <div className="mb-4">
+            <div className="w-32 h-4 bg-gray-200 rounded mb-2" />
+            <div className="w-6 h-6 bg-gray-200 rounded mb-2" />
+          </div>
+
+          <div className="mb-6">
+            <div className="w-32 h-4 bg-gray-200 rounded mb-2" />
+            <div className="w-24 h-4 bg-gray-200 rounded" />
+          </div>
+
+          <div className="mb-6 flex items-center gap-4">
+            <div className="w-24 h-4 bg-gray-200 rounded" />
+            <div className="w-20 h-10 bg-gray-200 rounded" />
+          </div>
+
+          <div className="flex gap-4 mb-4">
+            <div className="w-40 h-10 bg-gray-200 rounded" />
+            <div className="w-40 h-10 bg-gray-200 rounded" />
+          </div>
+
+          <div className="space-y-2 mb-6">
+            <div className="w-3/4 h-4 bg-gray-200 rounded" />
+            <div className="w-2/3 h-4 bg-gray-200 rounded" />
+            <div className="w-1/2 h-4 bg-gray-200 rounded" />
+          </div>
+
+          <div className="w-40 h-12 bg-gray-300 rounded" />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
-      {!product ? (
+      {loading ? <><ProductDetailSkeleton /></> : !product ? (
         <div className="container-padding section-space">
           <NoResults />
         </div>
@@ -85,8 +118,8 @@ const ProjectDetails = ({ refreshCart }: ProductDetailsPageProps) => {
             <div>
               {/* Zoomable main image */}
               <InnerImageZoom
-                src={product?.["Image Ref"]}
-                zoomSrc={product?.["Image Ref"]} // High-res image if different; same here
+                src={product?.ImageRef}
+                zoomSrc={product?.ImageRef} // High-res image if different; same here
                 // alt={product?.Description}
                 zoomType="hover"
                 zoomScale={1.5}
@@ -96,7 +129,7 @@ const ProjectDetails = ({ refreshCart }: ProductDetailsPageProps) => {
               {/* Thumbnail */}
               <div className="mt-4">
                 <img
-                  src={product?.["Image Ref"]}
+                  src={product?.ImageRef}
                   alt="Thumbnail"
                   className="w-24 h-24 object-contain border p-1 mt-4"
                 />

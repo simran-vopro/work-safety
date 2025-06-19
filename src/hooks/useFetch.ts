@@ -30,8 +30,6 @@ const useFetch = <T>(url: string, params: Record<string, any> = {}): FetchState<
     };
 
     useEffect(() => {
-
-
         fetchData();
     }, [url, JSON.stringify(params)]); // stringify to track param changes
 

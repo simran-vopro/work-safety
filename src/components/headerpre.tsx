@@ -25,7 +25,7 @@ const HeaderPre = () => {
             ],
         },
         { name: "Categories", path: "/categories" },
-        { name: "Contact", path: "/contact" },
+        { name: "Contact", path: "/sendQuotation" },
     ];
 
     const navigate = useNavigate();

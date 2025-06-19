@@ -1,10 +1,6 @@
 import React from "react";
-import { ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { ProductType } from "../hooks/useProduct";
-import axios from "axios";
-import { API_PATHS } from "../utils/config";
-import { getSessionId } from "../pages/products/details";
 
 type ProductGridProps = {
   products: ProductType[];
@@ -23,9 +19,6 @@ const SkeletonCard = () => (
     <div className="mt-1 h-5 bg-gray-300 rounded w-2/3"></div>
   </div>
 );
-
-
-
 
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products, gridCols, loading }) => {
@@ -50,7 +43,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, gridCols, loading }
                 className="relative border border-gray-200 h-72 overflow-hidden flex items-center justify-center transition-transform duration-300 group-hover:scale-101"
               >
                 <img
-                  src={item["Image Ref"]}
+                  src={item.ImageRef}
                   alt={item.ExtendedCharacterDesc}
                   className="w-full h-40 object-contain"
                 />

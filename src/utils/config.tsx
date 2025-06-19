@@ -1,10 +1,17 @@
-export const BASE_URL = "http://localhost:3000";
-export const IMAGE_URL = "http://localhost:3000/static";
+export const BASE_URL = "https://work-safety-backend.onrender.com";
+export const IMAGE_URL = "https://work-safety-backend.onrender.com/static";
+
+// export const BASE_URL = "http://localhost:3000";
+// export const IMAGE_URL = "http://localhost:3000/static";
 
 export const API_PATHS = {
+  LOGIN: `${BASE_URL}/api/auth/login`,
+  EDIT_PROFILE : `${BASE_URL}/api/auth/edit`,
+  CHANGE_PASSWORD : `${BASE_URL}/api/auth/change-password`,
+
   CATEGORIES: `${BASE_URL}/api/categories/nested-categories`,
   PRODUCTS: `${BASE_URL}/api/products`,
-  GET_PRODUCT: `${BASE_URL}/api/get-product`,
+  GET_PRODUCT: `${BASE_URL}/api/products/get-product`,
 
   TOP_BANNERS: `${BASE_URL}/api/banner`,
   GET_FLOATING_BANNER: `${BASE_URL}/api/banner/getFloatingBanner`,
@@ -21,6 +28,10 @@ export const API_PATHS = {
   PLACE_ORDER: `${BASE_URL}/api/order/request-quote`,
   GET_ORDER: `${BASE_URL}/api/order/get-order`,
   EDIT_ORDER: `${BASE_URL}/api/order/edit-order`,
+  SEND_QUERY: `${BASE_URL}/api/query/send-query`,
+
+  GET_ALL_ORDERS: `${BASE_URL}/api/order/get-all-orders`,
+
 
 
 };

@@ -27,6 +27,7 @@ import new_arrivals from "../assets/images/categories/1.jpg"
 
 
 import contact from "../assets/images/contact.png"
+import query from "../assets/images/query.jpg"
 
 const images = {
     logo,
@@ -51,7 +52,8 @@ const images = {
     a2,
     a3,
     a4,
-    new_arrivals
+    new_arrivals,
+    query
 }
 
 

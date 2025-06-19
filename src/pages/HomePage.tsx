@@ -44,7 +44,7 @@ export interface ProductType {
     Brand: string;
     ExtendedCharacterDesc: string;
     CatalogueCopy: string;
-    "Image Ref": string;
+    ImageRef: string;
     Style: string;
     Category1: Category;
     Category2: Category;

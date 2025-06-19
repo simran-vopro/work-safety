@@ -18,9 +18,9 @@ import SectionHeading from "../components/SectionHeading";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_PATHS } from "../utils/config";
-import { getSessionId } from "./products/details";
 import toast from "react-hot-toast";
 import NoResults from "../components/NoResults";
+import { getUserId } from "../utils/createGuestUserId";
 
 // Define form field types
 type FormField =
@@ -39,7 +39,7 @@ type FormData = {
   [key in FormField]: string;
 };
 
-const ContactPage = () => {
+const SendQuotation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const cartItems = location.state;
@@ -88,7 +88,7 @@ const ContactPage = () => {
         text: formData.message,
         email: formData.email,
         phone: formData.phone,
-        sessionId: getSessionId(),
+        userId: getUserId(),
         products: cartItems,
       });
 
@@ -296,4 +296,4 @@ const ContactPage = () => {
   );
 };
 
-export default ContactPage;
+export default SendQuotation;
